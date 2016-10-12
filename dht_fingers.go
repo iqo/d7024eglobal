@@ -45,7 +45,7 @@ func (node *DHTNode) updateNetworkFingers() {
 		x, _ := hex.DecodeString(node.nodeId)
 		y, _ := calcFinger(x, (i + 1), bits)
 		booleanResponseTest := false
-		if y == "" {
+		if y == " " {
 			y = "00"
 		} else {
 			responseTimmer := time.NewTimer(time.Second * 3)
