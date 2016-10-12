@@ -58,12 +58,11 @@ func TestDHT2(t *testing.T) {
 	node7.join(master)
 	time.Sleep(time.Second * 5)
 
-	node1.initNetworkLookUp("04", node2)
+	//node1.initNetworkLookUp("04", node2)
+	node1.initPrintNetworkFingers(node2)
 
 	node4.transport.listen()
 
-
-//Glöm inte lägga till en timer på "20000sek" så inte allt dör.
-
+	//Glöm inte lägga till en timer på "20000sek" så inte allt dör.
 
 }

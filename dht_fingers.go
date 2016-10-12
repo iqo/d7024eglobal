@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const bits int = 4
+const bits int = 3
 
 /*type FingerTable struct{
 	nodefingerlist [bits]*DHTNode
@@ -22,7 +22,7 @@ type Finger struct {
 	adress string
 }
 
-func (node *DHTNode) setFingers(msg *Msg) {
+func (node *DHTNode) setNetworkFingers(msg *Msg) {
 	for i := 0; i < bits; i++ {
 		id := node.nodeId
 		adress := node.contact.ip + ":" + node.contact.port
@@ -39,26 +39,7 @@ func (node *DHTNode) fingerTimer() {
 	}
 }
 
-/*
-func init_finger_table(n *DHTNode) [bits]*DHTNode{
-	var templist [bits]*DHTNode
-	for i := 0; i < bits; i++ {
-		x,_ := hex.DecodeString(n.nodeId) //func DecodeString(s string) ([]byte, error)
-		y, _ := calcFinger(x, (i+1), bits) // returnerar (string, []byte)
-		if y == "" {
-			y = "00"
-		} else{}
-		//fmt.Println("FINGER", i+1, "POINTS ON NODE", y)
-		succ := n.lookup(y)  //ändra ej, vanlig lookup
-		// calcFinger(n []byte, k int, m int) (string, []byte) {
-		templist[i] = succ
-
-	}
-return templist
-}
-*/
-
-func (node *DHTNode) updateFingers() {
+func (node *DHTNode) updateNetworkFingers() {
 	nodeAdress := node.contact.ip + ":" + node.contact.port
 	for i := 0; i < bits; i++ {
 		x, _ := hex.DecodeString(node.nodeId)
@@ -68,7 +49,7 @@ func (node *DHTNode) updateFingers() {
 			y = "00"
 		} else {
 			responseTimmer := time.NewTimer(time.Second * 3)
-			fingerMsg := fingerLookUpMessage(nodeAdress, y, nodeAdress, node.successor.adress)
+			fingerMsg := lookUpMessage(nodeAdress, y, nodeAdress, node.successor.adress)
 			go func() {
 				node.transport.send(fingerMsg)
 			}()
@@ -90,11 +71,30 @@ func (node *DHTNode) updateFingers() {
 	}
 }
 
-/*if y == node.fingers.nodefingerlist[i].nodeId {
-		} else {
-			a := node.lookup(y)
-			node.fingers.nodefingerlist[i] = a
-		}
+func (node *DHTNode) PrintOutNetworkFingers() {
+	len_list := len(node.fingers.nodefingerlist)
+	for i := 0; i < len_list; i++ {
+		fmt.Println(node.fingers.nodefingerlist[i])
 	}
-	return node.fingers.nodefingerlist
-}*/
+}
+
+func (node *DHTNode) printNetworkFingers(msg *Msg) {
+	if msg.Origin != msg.Dst {
+		fmt.Println("finger for node: ", node.nodeId, "is <")
+		node.PrintOutNetworkFingers()
+		fmt.Println(">")
+		fingerPrintMsg := fingerPrintMessage(msg.Origin, node.successor.adress)
+		go func() { node.transport.send(fingerPrintMsg) }()
+	} else {
+		fmt.Println("finger for node: ", node.nodeId, "is <")
+		node.PrintOutNetworkFingers()
+		fmt.Println(">")
+	}
+}
+
+func (dhtnode *DHTNode) initPrintNetworkFingers(node *DHTNode) {
+	printMsg := fingerPrintMessage(dhtnode.transport.bindAddress, node.transport.bindAddress)
+	go func() {
+		dhtnode.transport.send(printMsg)
+	}()
+}

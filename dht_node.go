@@ -106,6 +106,7 @@ func (node *DHTNode) printNetworkRing(msg *Msg) {
 func (dhtNode *DHTNode) start_server() {
 	go dhtNode.initTaskQ()
 	go dhtNode.stableTimmer()
+	go dhtNode.fingerTimer()
 	go dhtNode.transport.listen()
 }
 
@@ -133,7 +134,7 @@ func (node *DHTNode) initTaskQ() {
 					//			fmt.Println("stabilize case: ", node.nodeId)
 					node.stabilize()
 				case "updateFingers":
-					node.updateFingers()
+					node.updateNetworkFingers()
 				}
 			}
 		}
@@ -235,7 +236,6 @@ func (dhtnode *DHTNode) networkLookup(msg *Msg) {
 			//return
 		}
 	} else {
-		fmt.Println("lookup else ")
 		lookUpMsg := lookUpMessage(msg.Origin, msg.Key, nodeAdress, dhtnode.successor.adress)
 		go func() { dhtnode.transport.send(lookUpMsg) }()
 	}
