@@ -56,9 +56,13 @@ func TestDHT2(t *testing.T) {
 	node3.join(master)
 	node0.join(master)
 	node7.join(master)
+	//node1.isTheNodeAlive()
+	//node1.killTheNode()
 	time.Sleep(time.Second * 5)
+	node1.PrintOutNetworkFingers()
+	//node1.isTheNodeAlive()
 
-	node1.initLookUpNetworkFingers("08", node3)
+	//node1.initLookUpNetworkFingers("08", node3)
 
 	//node1.initNetworkLookUp("01", node1)
 	//node1.initPrintNetworkFingers(node2)
