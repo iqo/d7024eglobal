@@ -253,29 +253,3 @@ func (node *DHTNode) initNetworkLookUp(key string, dhtnode *DHTNode) {
 		dhtnode.transport.send(lookUpMsg)
 	}()
 }
-
-/*func (node *DHTNode) lookupFingers(msg *Msg) {
-	src := node.contact.ip + ":" + node.contact.port
-	fingers := node.fingers.nodefingerlist
-	lenghtOfFingers := len(fingers)
-
-	//gå baklänges i fingertable
-	for i := lenghtOfFingers; i > 0; i-- {
-		//Fungerar fingers.nodeId här!?
-		//fmt.Println(node.successor.nodeId)
-		//fmt.Println("ndoe id, finger id, key")
-		var a = between([]byte(node.nodeId), []byte(fingers[(i-1)].id), []byte(msg.Key))
-		if !(a) {
-			fmt.Println("else between")
-			fmt.Println(node.nodeId)
-			//contact.ip i slutet på fingers?
-			FingerLookUpMsg := fingerLookUpMessage(msg.Origin, msg.Key, src, fingers[(i-1)].adress)
-			go func() {
-				node.transport.send(FingerLookUpMsg)
-			}()
-			//return //return sats här?!
-			return //return sats här?!
-		}
-	}
-	//return //return sats här?!
-}*/
