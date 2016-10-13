@@ -98,3 +98,11 @@ func (dhtnode *DHTNode) initPrintNetworkFingers(node *DHTNode) {
 		dhtnode.transport.send(printMsg)
 	}()
 }
+
+func (node *DHTNode) initLookUpNetworkFingers(key string, dhtnode *DHTNode) {
+	fingerLookUpMsg := fingerLookUpMessage(node.transport.bindAddress, key, node.transport.bindAddress, dhtnode.transport.bindAddress)
+	fmt.Println("Finger lookup")
+	go func() {
+		dhtnode.transport.send(fingerLookUpMsg)
+	}()
+}
