@@ -75,6 +75,9 @@ func (transport *Transport) initmsgQ() {
 				case "lookup":
 					//fmt.Println("initmsgQ lookup: ")
 					go transport.node.networkLookup(msg)
+				case "fingerLookup":
+					go transport.node.LookUpNetworkFinger(msg)
+					//go transport.node.lookupFingers(msg)
 				}
 			}
 		}

@@ -227,17 +227,18 @@ func (dhtnode *DHTNode) networkLookup(msg *Msg) {
 
 	if between([]byte(dhtnode.nodeId), []byte(dhtnode.successor.nodeId), []byte(msg.Key)) {
 		if dhtnode.nodeId == msg.Key {
-			fmt.Println(dhtnode.nodeId)
+			//fmt.Println(dhtnode.nodeId)
 			respMsg := responseMessage(nodeAdress, msg.Origin, nodeAdress, dhtnode.nodeId)
 			go func() { dhtnode.transport.send(respMsg) }()
 			//return
 		} else {
-			fmt.Println(dhtnode.successor.nodeId)
+			//fmt.Println(dhtnode.successor.nodeId)
 			respMsg := responseMessage(nodeAdress, msg.Origin, dhtnode.successor.adress, dhtnode.successor.nodeId)
 			go func() { dhtnode.transport.send(respMsg) }()
 			//return
 		}
 	} else {
+		//fmt.Println("lookup else ")
 		lookUpMsg := lookUpMessage(msg.Origin, msg.Key, nodeAdress, dhtnode.successor.adress)
 		go func() { dhtnode.transport.send(lookUpMsg) }()
 	}
@@ -253,7 +254,7 @@ func (node *DHTNode) initNetworkLookUp(key string, dhtnode *DHTNode) {
 	}()
 }
 
-func (node *DHTNode) lookupFingers(msg *Msg) {
+/*func (node *DHTNode) lookupFingers(msg *Msg) {
 	src := node.contact.ip + ":" + node.contact.port
 	fingers := node.fingers.nodefingerlist
 	lenghtOfFingers := len(fingers)
@@ -261,18 +262,20 @@ func (node *DHTNode) lookupFingers(msg *Msg) {
 	//gå baklänges i fingertable
 	for i := lenghtOfFingers; i > 0; i-- {
 		//Fungerar fingers.nodeId här!?
+		//fmt.Println(node.successor.nodeId)
+		//fmt.Println("ndoe id, finger id, key")
 		var a = between([]byte(node.nodeId), []byte(fingers[(i-1)].id), []byte(msg.Key))
-		if a {
-			return //return sats här?!
-		} else {
+		if !(a) {
+			fmt.Println("else between")
+			fmt.Println(node.nodeId)
 			//contact.ip i slutet på fingers?
-			lookUpMsg := lookUpMessage(msg.Origin, msg.Key, src, fingers[(i-1)].adress)
+			FingerLookUpMsg := fingerLookUpMessage(msg.Origin, msg.Key, src, fingers[(i-1)].adress)
 			go func() {
-				node.transport.send(lookUpMsg)
+				node.transport.send(FingerLookUpMsg)
 			}()
 			//return //return sats här?!
-
+			return //return sats här?!
 		}
 	}
-	return //return sats här?!
-}
+	//return //return sats här?!
+}*/
