@@ -6,9 +6,10 @@ import (
 )
 
 func (dhtnode *DHTNode) heartBeat() {
-	nodeAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
-	heartMsg := heartBeatMessage(nodeAdress, dhtnode.predecessor.adress)
-	go func() { dhtnode.transport.send(heartMsg) }()
+	//nodeAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
+	//heartMsg := heartBeatMessage(nodeAdress, dhtnode.predecessor.adress)
+	fmt.Println(dhtnode.predecessor.nodeId, "has adress ", dhtnode.predecessor.adress)
+	/*go func() { dhtnode.transport.send(heartMsg) }()
 	waitTimer := time.NewTimer(time.Second * 4)
 	for {
 		select {
@@ -23,12 +24,12 @@ func (dhtnode *DHTNode) heartBeat() {
 			dhtnode.stabilize()
 			return
 		}
-	}
+	}*/
 }
 
 func (dhtnode *DHTNode) heartTimer() {
 	for {
-		fmt.Println("...")
+		//fmt.Println("heart timer")
 		time.Sleep(time.Second * 3)
 		dhtnode.createNewTask(nil, "heartBeat")
 	}

@@ -78,6 +78,12 @@ func (transport *Transport) initmsgQ() {
 				case "fingerLookup":
 					go transport.node.LookUpNetworkFinger(msg)
 					//go transport.node.lookupFingers(msg)
+				case "heartBeat":
+					if transport.node.alive {
+						transport.node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
+					}
+				case "heartAnswer":
+					transport.node.heartBeatQ <- msg
 				}
 			}
 		}

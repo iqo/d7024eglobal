@@ -25,7 +25,6 @@ type DHTNode struct {
 	heartBeatQ  chan *Msg
 	alive       bool
 }
-
 type tinyNode struct {
 	nodeId string
 	adress string
@@ -40,7 +39,6 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode := new(DHTNode)
 	dhtNode.contact.ip = ip
 	dhtNode.contact.port = port
-	dhtNode.alive = true
 
 	if nodeId == nil {
 		genNodeId := generateNodeId()
@@ -50,12 +48,13 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	}
 
 	dhtNode.successor = &tinyNode{dhtNode.nodeId, ip + ":" + port}
-	dhtNode.predecessor = &tinyNode{"", ""}
+	dhtNode.predecessor = &tinyNode{dhtNode.nodeId, ip + ":" + port}
 	dhtNode.fingers = new(FingerTable)
 	//ska new användas eller raden under?
 	//dhtNode.fingers.nodefingerlist = [bits]*DHTNode{}
 	//eller denna kanske
 	//dhtNode.fingers = &FingerTable{}
+	dhtNode.alive = true
 	dhtNode.createTransport()
 	dhtNode.responseQ = make(chan *Msg)
 	dhtNode.TaskQ = make(chan *Task)
@@ -108,10 +107,10 @@ func (node *DHTNode) printNetworkRing(msg *Msg) {
 }
 
 func (dhtNode *DHTNode) start_server() {
-	go dhtNode.heartTimer()
 	go dhtNode.initTaskQ()
 	go dhtNode.stableTimmer()
 	go dhtNode.fingerTimer()
+	go dhtNode.heartTimer()
 	go dhtNode.transport.listen()
 }
 
@@ -142,6 +141,7 @@ func (node *DHTNode) initTaskQ() {
 					node.updateNetworkFingers()
 
 				case "heartBeat":
+					//fmt.Println("initTask hearbeat")
 					node.heartBeat()
 				}
 			}
@@ -185,7 +185,7 @@ func (node *DHTNode) stabilize() {
 
 func (dhtnode *DHTNode) stableTimmer() {
 	for {
-		if dhtnode.isTheNodeAlive() {
+		if dhtnode.alive {
 			time.Sleep(time.Millisecond * 5000)
 			dhtnode.createNewTask(nil, "stabilize")
 		}
@@ -193,7 +193,7 @@ func (dhtnode *DHTNode) stableTimmer() {
 }
 
 func (node *DHTNode) createNewTask(msg *Msg, typeOfTask string) {
-	if node.isTheNodeAlive() {
+	if node.alive {
 		task := &Task{msg, typeOfTask}
 		node.TaskQ <- task
 	}
@@ -275,10 +275,10 @@ func (dhtnode *DHTNode) killTheNode() {
 	dhtnode.predecessor.nodeId = ""
 }
 
-func (dhtnode *DHTNode) isTheNodeAlive() bool {
-	if dhtnode.alive == true {
+/*func (dhtnode *DHTNode) isTheNodeAlive() bool {
+	if dhtnode.alive {
 		return true
 	} else {
 		return false
 	}
-}
+}*/
