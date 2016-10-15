@@ -6,11 +6,11 @@ import (
 )
 
 func (dhtnode *DHTNode) heartBeat() {
-	//nodeAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
-	//heartMsg := heartBeatMessage(nodeAdress, dhtnode.predecessor.adress)
+	nodeAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
+	heartMsg := heartBeatMessage(nodeAdress, dhtnode.predecessor.adress)
 	fmt.Println(dhtnode.predecessor.nodeId, "has adress ", dhtnode.predecessor.adress)
-	/*go func() { dhtnode.transport.send(heartMsg) }()
-	waitTimer := time.NewTimer(time.Second * 4)
+	waitTimer := time.NewTimer(time.Second * 3)
+	go func() { dhtnode.transport.send(heartMsg) }()
 	for {
 		select {
 		case <-dhtnode.heartBeatQ:
@@ -24,13 +24,13 @@ func (dhtnode *DHTNode) heartBeat() {
 			dhtnode.stabilize()
 			return
 		}
-	}*/
+	}
 }
 
 func (dhtnode *DHTNode) heartTimer() {
 	for {
 		//fmt.Println("heart timer")
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Second * 4)
 		dhtnode.createNewTask(nil, "heartBeat")
 	}
 }

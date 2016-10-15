@@ -71,4 +71,6 @@ func TestDHT2(t *testing.T) {
 
 	//Glöm inte lägga till en timer på "20000sek" så inte allt dör.
 
+	time.Sleep(2000 * time.Second)
+
 }

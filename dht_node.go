@@ -133,7 +133,6 @@ func (node *DHTNode) initTaskQ() {
 					//transport.send(&Msg{"printRing", "", v.Src, []byte("tjuuu")})
 				case "join":
 					node.findSucc(t.message)
-
 				case "stabilize":
 					//			fmt.Println("stabilize case: ", node.nodeId)
 					node.stabilize()
@@ -141,7 +140,7 @@ func (node *DHTNode) initTaskQ() {
 					node.updateNetworkFingers()
 
 				case "heartBeat":
-					//fmt.Println("initTask hearbeat")
+					fmt.Println("initTask hearbeat")
 					node.heartBeat()
 				}
 			}
