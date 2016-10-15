@@ -48,11 +48,11 @@ func (node *DHTNode) updateNetworkFingers() {
 		if y == " " {
 			y = "00"
 		} else {
-			responseTimmer := time.NewTimer(time.Second * 3)
 			fingerMsg := lookUpMessage(nodeAdress, y, nodeAdress, node.successor.adress)
 			go func() {
 				node.transport.send(fingerMsg)
 			}()
+			responseTimmer := time.NewTimer(time.Second * 3)
 			for booleanResponseTest != true {
 				select {
 
@@ -63,7 +63,7 @@ func (node *DHTNode) updateNetworkFingers() {
 
 				case e := <-responseTimmer.C:
 
-					fmt.Println(e, "timeout: ")
+					fmt.Println(e, "timeout in updateNetworkFingers: ")
 					booleanResponseTest = true
 				}
 			}
