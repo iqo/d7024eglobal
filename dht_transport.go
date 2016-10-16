@@ -35,15 +35,16 @@ func (transport *Transport) listen() {
 }
 
 func (transport *Transport) send(msg *Msg) {
-	udpAddr, err := net.ResolveUDPAddr("udp", msg.Dst)
-	conn, err := net.DialUDP("udp", nil, udpAddr)
-	if err != nil {
-		fmt.Println("error SEND function is:", err)
+	if transport.node.alive {
+		udpAddr, err := net.ResolveUDPAddr("udp", msg.Dst)
+		conn, err := net.DialUDP("udp", nil, udpAddr)
+		if err != nil {
+			fmt.Println("error SEND function is:", err)
+		}
+		encoded, err := json.Marshal(msg)
+		defer conn.Close()
+		_, err = conn.Write(encoded)
 	}
-	encoded, err := json.Marshal(msg)
-	defer conn.Close()
-	_, err = conn.Write(encoded)
-
 }
 
 func (transport *Transport) initmsgQ() {
@@ -73,10 +74,11 @@ func (transport *Transport) initmsgQ() {
 				case "pred":
 					transport.node.getPred(msg)
 				case "lookup":
+					go transport.node.improvedNetworkLookUp(msg)
 					//fmt.Println("initmsgQ lookup: ")
-					go transport.node.networkLookup(msg)
+					//go transport.node.networkLookup(msg)
 				case "fingerLookup":
-					go transport.node.LookUpNetworkFinger(msg)
+					//go transport.node.LookUpNetworkFinger(msg)
 					//go transport.node.lookupFingers(msg)
 				case "heartBeat":
 					if transport.node.alive {
@@ -84,6 +86,15 @@ func (transport *Transport) initmsgQ() {
 					}
 				case "heartAnswer":
 					transport.node.heartBeatQ <- msg
+				case "isAlive":
+					if transport.node.alive {
+						transport.node.transport.send(responseMessage(msg.Dst, msg.Origin, transport.bindAddress, transport.node.nodeId))
+					}
+				case "nodeFound":
+					transport.node.transport.send(ackMsg(msg.Dst, msg.Origin))
+					transport.node.fingerQ <- &Finger{msg.Adress, msg.Id}
+				case "ack":
+					transport.node.responseQ <- msg
 				}
 			}
 		}

@@ -153,3 +153,39 @@ func heartBeatAnswer(origin, dst string) *Msg {
 	msg.Bytes = nil
 	return msg
 }
+
+func AliveMessage(origin, dst string) *Msg {
+	msg := &Msg{}
+	msg.Type = "isAlive"
+	msg.Adress = ""
+	msg.Id = ""
+	msg.Origin = origin
+	msg.Src = ""
+	msg.Dst = dst
+	msg.Bytes = nil
+	return msg
+}
+
+func nodeFoundMessage(origin, dst, adress, id string) *Msg {
+	msg := &Msg{}
+	msg.Type = "nodeFound"
+	msg.Adress = adress
+	msg.Id = id
+	msg.Origin = origin
+	msg.Src = ""
+	msg.Dst = dst
+	msg.Bytes = nil
+	return msg
+}
+
+func ackMsg(src, dst string) *Msg {
+	msg := &Msg{}
+	msg.Type = "ack"
+	msg.Adress = ""
+	msg.Id = "id"
+	msg.Origin = ""
+	msg.Src = src
+	msg.Dst = dst
+	msg.Bytes = nil
+	return msg
+}

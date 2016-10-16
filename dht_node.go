@@ -23,7 +23,10 @@ type DHTNode struct {
 	responseQ   chan *Msg
 	TaskQ       chan *Task
 	heartBeatQ  chan *Msg
-	alive       bool
+	fingerQ     chan *Finger
+	nodeQ       chan *Msg
+
+	alive bool
 }
 type tinyNode struct {
 	nodeId string
@@ -59,6 +62,8 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.responseQ = make(chan *Msg)
 	dhtNode.TaskQ = make(chan *Task)
 	dhtNode.heartBeatQ = make(chan *Msg)
+	dhtNode.fingerQ = make(chan *Finger)
+	dhtNode.nodeQ = make(chan *Msg)
 	return dhtNode
 }
 
@@ -233,7 +238,7 @@ func (node *DHTNode) PrintRingProc() {
 	}()
 }
 
-func (dhtnode *DHTNode) networkLookup(msg *Msg) {
+/*func (dhtnode *DHTNode) networkLookup(msg *Msg) {
 	nodeAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
 
 	if between([]byte(dhtnode.nodeId), []byte(dhtnode.successor.nodeId), []byte(msg.Key)) {
@@ -263,7 +268,7 @@ func (node *DHTNode) initNetworkLookUp(key string, dhtnode *DHTNode) {
 	go func() {
 		dhtnode.transport.send(lookUpMsg)
 	}()
-}
+}*/
 
 func (dhtnode *DHTNode) killTheNode() {
 	fmt.Println("killing node ", dhtnode.nodeId)
