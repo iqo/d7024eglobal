@@ -92,9 +92,11 @@ func (transport *Transport) initmsgQ() {
 					}
 				case "nodeFound":
 					transport.node.transport.send(ackMsg(msg.Dst, msg.Origin))
-					transport.node.fingerQ <- &Finger{msg.Adress, msg.Id}
+					transport.node.fingerQ <- &Finger{msg.Key, msg.Adress}
 				case "ack":
 					transport.node.responseQ <- msg
+				case "fingerStart":
+					go transport.node.setNetworkFingers(msg)
 				}
 			}
 		}

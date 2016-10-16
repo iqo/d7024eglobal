@@ -23,12 +23,12 @@ func (dhtnode *DHTNode) findNextAlive(key int) string {
 	//fmt.Println("dht adress:", dhtAdress, "node fingerlist adress", dhtnode.fingers.nodefingerlist[key].adress)
 	notDead := AliveMessage(dhtAdress, dhtnode.fingers.nodefingerlist[key].adress)
 	go dhtnode.transport.send(notDead)
-	timerResp := time.NewTimer(time.Second * 1)
+	timerResp := time.NewTimer(time.Millisecond * 100)
 	for {
 		select {
 		case r := <-dhtnode.responseQ:
 			if r.Adress != "" {
-				fmt.Println("lookUp ", r.Adress)
+				//fmt.Println("lookUp ", r.Adress)
 				return r.Adress
 			} else {
 				return dhtnode.findNextAlive(key + 1)
@@ -44,8 +44,7 @@ func (dhtnode *DHTNode) findNextAlive(key int) string {
 
 func (dhtnode *DHTNode) improvedNetworkLookUp(msg *Msg) {
 	dhtAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
-	timerResp := time.NewTimer(time.Second * 1)
-
+	timerResp := time.NewTimer(time.Millisecond * 100)
 	if dhtnode.resposibleNetworkNode(msg.Key) {
 		foundMsg := nodeFoundMessage(dhtAdress, msg.Origin, dhtAdress, dhtnode.nodeId)
 		dhtnode.transport.send(foundMsg)
@@ -63,7 +62,7 @@ func (dhtnode *DHTNode) improvedNetworkLookUp(msg *Msg) {
 		next := dhtnode.findNextAlive(0)
 		lookUpMsg := lookUpMessage(msg.Origin, msg.Key, dhtAdress, next)
 		dhtnode.transport.send(lookUpMsg)
-		fmt.Println(dhtnode.nodeId)
+		//fmt.Println(dhtnode.nodeId)
 	}
 	return
 }

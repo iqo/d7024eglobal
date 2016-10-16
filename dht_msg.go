@@ -182,7 +182,19 @@ func ackMsg(src, dst string) *Msg {
 	msg := &Msg{}
 	msg.Type = "ack"
 	msg.Adress = ""
-	msg.Id = "id"
+	msg.Id = ""
+	msg.Origin = ""
+	msg.Src = src
+	msg.Dst = dst
+	msg.Bytes = nil
+	return msg
+}
+
+func fingerStartMessage(src, dst, adress, id string) *Msg {
+	msg := &Msg{}
+	msg.Type = "fingerStart"
+	msg.Adress = adress
+	msg.Id = id
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst

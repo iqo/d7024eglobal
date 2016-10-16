@@ -52,18 +52,18 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 
 	dhtNode.successor = &tinyNode{dhtNode.nodeId, ip + ":" + port}
 	dhtNode.predecessor = &tinyNode{dhtNode.nodeId, ip + ":" + port}
-	dhtNode.fingers = new(FingerTable)
+	dhtNode.fingers = &FingerTable{}
 	//ska new användas eller raden under?
 	//dhtNode.fingers.nodefingerlist = [bits]*DHTNode{}
 	//eller denna kanske
 	//dhtNode.fingers = &FingerTable{}
 	dhtNode.alive = true
-	dhtNode.createTransport()
 	dhtNode.responseQ = make(chan *Msg)
 	dhtNode.TaskQ = make(chan *Task)
 	dhtNode.heartBeatQ = make(chan *Msg)
 	dhtNode.fingerQ = make(chan *Finger)
 	dhtNode.nodeQ = make(chan *Msg)
+	dhtNode.createTransport()
 	return dhtNode
 }
 
@@ -82,6 +82,9 @@ func (dhtNode *DHTNode) join(master *tinyNode) {
 		case r := <-dhtNode.responseQ:
 			dhtNode.successor.adress = r.Src
 			dhtNode.successor.nodeId = r.Key
+			dhtNode.setNetworkFingers(&Msg{"", "", "", "", nil, dhtNode.successor.adress, dhtNode.successor.nodeId, ""})
+			fingerStart := fingerStartMessage(src, dhtNode.successor.adress, dhtNode.transport.bindAddress, dhtNode.nodeId)
+			go func() { dhtNode.transport.send(fingerStart) }()
 			return
 			//fmt.Println(dhtNode.nodeId, dhtNode.successor)
 		}
@@ -143,10 +146,11 @@ func (node *DHTNode) initTaskQ() {
 					node.stabilize()
 				case "updateFingers":
 					node.updateNetworkFingers()
-
 				case "heartBeat":
 					fmt.Println("initTask hearbeat")
 					node.heartBeat()
+				case "alive":
+					fmt.Println("fuck")
 				}
 			}
 		}
@@ -156,7 +160,7 @@ func (node *DHTNode) initTaskQ() {
 func (node *DHTNode) stabilize() {
 	nodeAdress := node.contact.ip + ":" + node.contact.port
 	predOfSucc := getNodeMessage(nodeAdress, node.successor.adress) // id eller adress?
-	go func() { node.transport.send(predOfSucc) }()
+	go node.transport.send(predOfSucc)
 	time := time.NewTimer(time.Millisecond * 5000)
 	for {
 		select {
@@ -170,18 +174,17 @@ func (node *DHTNode) stabilize() {
 				//node.successor.nodeId = msg.Key
 				node.successor.nodeId = r.Key
 				//	fmt.Println("beetween")
-				return
+				//return
 			}
 			//ska notifymessage ha fler variabler?
 			N := notifyMessage(nodeAdress, node.successor.adress, nodeAdress, node.nodeId)
 
-			go func() {
-				node.transport.send(N)
-			}()
+			go node.transport.send(N)
 			//	fmt.Println("node id:", node.nodeId, "node successor id:", node.successor, "node predecessor id:", node.predecessor)
 			return
 		case timer := <-time.C: //timer
 			fmt.Println("TIMER ERROR:", timer)
+			node.updateSucc(1)
 			return
 		}
 	}
@@ -286,3 +289,30 @@ func (dhtnode *DHTNode) killTheNode() {
 		return false
 	}
 }*/
+
+func (dhtnode *DHTNode) updateSucc(key int) {
+	dhtAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
+	getPredOfFinger := getNodeMessage(dhtAdress, dhtnode.fingers.nodefingerlist[key].adress)
+	go dhtnode.transport.send(getPredOfFinger)
+
+	timerResp := time.NewTimer(time.Second * 1)
+	for {
+		select {
+		case r := <-dhtnode.responseQ:
+			if r.Id == "" {
+				dhtnode.successor.adress = dhtnode.fingers.nodefingerlist[key].adress
+				dhtnode.successor.nodeId = dhtnode.fingers.nodefingerlist[key].id
+				fmt.Println("update succ done")
+			}
+			notify := notifyMessage(dhtAdress, dhtnode.fingers.nodefingerlist[key].adress, dhtAdress, dhtnode.nodeId)
+			go dhtnode.transport.send(notify)
+			return
+
+		case <-timerResp.C:
+			if key < (bits - 1) {
+				dhtnode.updateSucc(key + 1)
+			}
+			return
+		}
+	}
+}
