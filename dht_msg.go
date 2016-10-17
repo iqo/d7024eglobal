@@ -3,14 +3,14 @@ package dht
 import ()
 
 type Msg struct {
-	Origin string
-	Key    string //värdet
-	Src    string //från noden som kalla
-	Dst    string //destinationsadress
-	Bytes  []byte //transport funktionen, msg.Bytes
-	Adress string //EVENTUELLT PEKA PÅ TINYNODE?
-	Id     string
-	Type   string // type of message thats is being sent
+	Origin   string
+	Key      string //värdet
+	Src      string //från noden som kalla
+	Dst      string //destinationsadress
+	Bytes    []byte //transport funktionen, msg.Bytes
+	Adress   string //EVENTUELLT PEKA PÅ TINYNODE?
+	liteNode *Finger
+	Type     string // type of message thats is being sent
 }
 
 func message(t, origin, dst, src, key string, bytes []byte) *Msg {
