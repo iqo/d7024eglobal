@@ -8,14 +8,17 @@ import (
 
 func (dhtnode *DHTNode) resposibleNetworkNode(key string) bool {
 	if dhtnode.predecessor.nodeId == key {
+		//fmt.Println("this is not know ")
 		return false
 	}
 	if dhtnode.nodeId == key {
+		//fmt.Println("this is know ")
 		return true
 	}
 
-	beeweetNodes := (between([]byte(dhtnode.predecessor.nodeId), []byte(dhtnode.nodeId), []byte(key)))
-	return beeweetNodes
+	//beeweetNodes := (between([]byte(dhtnode.predecessor.nodeId), []byte(dhtnode.nodeId), []byte(key)))
+	//return beeweetNodes
+	return (between([]byte(dhtnode.predecessor.nodeId), []byte(dhtnode.nodeId), []byte(key)))
 }
 
 func (dhtnode *DHTNode) findNextAlive(key int) string {
@@ -59,6 +62,7 @@ func (dhtnode *DHTNode) improvedNetworkLookUp(msg *Msg) {
 		}
 		return
 	} else {
+		//fmt.Println("fin next alive")
 		next := dhtnode.findNextAlive(0)
 		lookUpMsg := lookUpMessage(msg.Origin, msg.Key, dhtAdress, next)
 		dhtnode.transport.send(lookUpMsg)

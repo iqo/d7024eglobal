@@ -62,7 +62,7 @@ func (node *DHTNode) updateNetworkFingers() {
 
 				case responseCase := <-node.fingerQ:
 					node.fingers.nodefingerlist[i] = responseCase
-					fmt.Println("wtf", node.fingers.nodefingerlist[i])
+					//fmt.Println("wtf", node.fingers.nodefingerlist[i])
 					//createdFinger := &Finger{responseCase.id, responseCase.adress} //id eller key?
 					//node.fingers.nodefingerlist[i] = createdFinger
 					booleanResponseTest = true

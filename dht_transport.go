@@ -60,19 +60,19 @@ func (transport *Transport) initmsgQ() {
 				case "reply": //test
 					fmt.Println("hej:", string(msg.Bytes))
 				case "printRing":
-					transport.node.TaskQ <- &Task{msg, "printRing"} //transport.node.printRing()
+					go func() { transport.node.TaskQ <- &Task{msg, "printRing"} }() //transport.node.printRing()
 					//transport.send(&Msg{"ring", "", v.Src, []byte(transport.node.printRing())})
 				case "addToRing":
 					transport.node.printNetworkRing(msg)
 				case "response":
-					transport.node.responseQ <- msg
+					go func() { transport.node.responseQ <- msg }()
 				case "join":
-					transport.node.TaskQ <- &Task{msg, "join"}
+					go func() { transport.node.TaskQ <- &Task{msg, "join"} }()
 				case "notify":
 					//		fmt.Println("notify network")
-					transport.node.notifyNetwork(msg)
+					go transport.node.notifyNetwork(msg)
 				case "pred":
-					transport.node.getPred(msg)
+					go transport.node.getPred(msg)
 				case "lookup":
 					go transport.node.improvedNetworkLookUp(msg)
 					//fmt.Println("initmsgQ lookup: ")
@@ -85,16 +85,16 @@ func (transport *Transport) initmsgQ() {
 						transport.node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
 					}
 				case "heartAnswer":
-					transport.node.heartBeatQ <- msg
+					go func() { transport.node.heartBeatQ <- msg }()
 				case "isAlive":
 					if transport.node.alive {
 						transport.node.transport.send(responseMessage(msg.Dst, msg.Origin, transport.bindAddress, transport.node.nodeId))
 					}
 				case "nodeFound":
 					transport.node.transport.send(ackMsg(msg.Dst, msg.Origin))
-					transport.node.fingerQ <- &Finger{msg.Key, msg.Adress}
+					go func() { transport.node.fingerQ <- &Finger{msg.Key, msg.Adress} }()
 				case "ack":
-					transport.node.responseQ <- msg
+					go func() { transport.node.responseQ <- msg }()
 				case "fingerStart":
 					go transport.node.setNetworkFingers(msg)
 				}

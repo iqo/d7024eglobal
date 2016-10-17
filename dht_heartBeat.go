@@ -1,7 +1,7 @@
 package dht
 
 import (
-	//"fmt"
+	"fmt"
 	"time"
 )
 
@@ -18,7 +18,7 @@ func (dhtnode *DHTNode) heartBeat() {
 			return
 
 		case <-waitTimer.C:
-			//fmt.Println("heartstop", dhtnode.contact.port)
+			fmt.Println("heartstop", dhtnode.contact.port)
 			dhtnode.predecessor.adress = ""
 			dhtnode.predecessor.nodeId = ""
 			dhtnode.stabilize()
