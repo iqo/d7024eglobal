@@ -147,7 +147,7 @@ func (node *DHTNode) initTaskQ() {
 				case "updateFingers":
 					node.updateNetworkFingers()
 				case "heartBeat":
-					fmt.Println("initTask hearbeat")
+					//fmt.Println("initTask hearbeat")
 					node.heartBeat()
 				case "alive":
 					fmt.Println("fuck")

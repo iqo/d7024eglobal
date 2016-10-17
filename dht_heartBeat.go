@@ -10,7 +10,7 @@ func (dhtnode *DHTNode) heartBeat() {
 	heartMsg := heartBeatMessage(nodeAdress, dhtnode.predecessor.adress)
 	//fmt.Println(dhtnode.predecessor.nodeId, "has adress ", dhtnode.predecessor.adress)
 	waitTimer := time.NewTimer(time.Second * 3)
-	go func() { dhtnode.transport.send(heartMsg) }()
+	go dhtnode.transport.send(heartMsg)
 	for {
 		select {
 		case <-dhtnode.heartBeatQ:
@@ -21,7 +21,7 @@ func (dhtnode *DHTNode) heartBeat() {
 			fmt.Println("heartstop", dhtnode.contact.port)
 			dhtnode.predecessor.adress = ""
 			dhtnode.predecessor.nodeId = ""
-			dhtnode.stabilize()
+			go dhtnode.stabilize()
 			return
 		}
 	}
