@@ -301,7 +301,7 @@ func (dhtnode *DHTNode) updateSucc(key int) {
 	for {
 		select {
 		case r := <-dhtnode.responseQ:
-			if r.Id == "" {
+			if r.liteNode.id == "" {
 				dhtnode.successor.adress = dhtnode.fingers.nodefingerlist[key].adress
 				dhtnode.successor.nodeId = dhtnode.fingers.nodefingerlist[key].id
 				fmt.Println("update succ done")
