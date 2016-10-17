@@ -36,13 +36,17 @@ func (node *DHTNode) setNetworkFingers(msg *Msg) {
 
 func (node *DHTNode) fingerTimer() {
 	for {
-		time.Sleep(time.Second * 8)
-		node.createNewTask(nil, "updateFingers")
+		if node.alive {
+			time.Sleep(time.Second * 8)
+			node.createNewTask(nil, "updateFingers")
+		} else {
+			return
+		}
 	}
 }
 
 func (node *DHTNode) updateNetworkFingers() {
-	//node.PrintOutNetworkFingers()
+	node.PrintOutNetworkFingers()
 	//fmt.Println(node.contact.port, "updating fingers")
 	nodeAdress := node.contact.ip + ":" + node.contact.port
 	booleanResponseTest := false
@@ -50,9 +54,10 @@ func (node *DHTNode) updateNetworkFingers() {
 		if node.fingers.nodefingerlist[i] != nil {
 			x, _ := hex.DecodeString(node.nodeId)
 			y, _ := calcFinger(x, (i + 1), bits)
-			if y == " " {
+			if y == "" {
 				y = "00"
 			}
+
 			//fmt.Println("update lookup")
 			fingerMsg := lookUpMessage(nodeAdress, y, nodeAdress, node.successor.adress)
 			go node.transport.send(fingerMsg)
@@ -61,6 +66,7 @@ func (node *DHTNode) updateNetworkFingers() {
 				select {
 
 				case responseCase := <-node.fingerQ:
+					fmt.Println("found", responseCase, "---")
 					node.fingers.nodefingerlist[i] = responseCase
 					//fmt.Println("wtf", node.fingers.nodefingerlist[i])
 					//createdFinger := &Finger{responseCase.id, responseCase.adress} //id eller key?

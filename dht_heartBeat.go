@@ -29,8 +29,12 @@ func (dhtnode *DHTNode) heartBeat() {
 
 func (dhtnode *DHTNode) heartTimer() {
 	for {
-		//fmt.Println("heart timer")
-		time.Sleep(time.Second * 4)
-		dhtnode.createNewTask(nil, "heartBeat")
+		if dhtnode.alive {
+			//fmt.Println("heart8 timer")
+			time.Sleep(time.Second * 4)
+			go dhtnode.createNewTask(nil, "heartBeat")
+		} else {
+			return
+		}
 	}
 }

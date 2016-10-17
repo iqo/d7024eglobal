@@ -170,7 +170,7 @@ func nodeFoundMessage(origin, dst, adress, id string) *Msg {
 	msg := &Msg{}
 	msg.Type = "nodeFound"
 	msg.Adress = adress
-	msg.Id = id
+	msg.Key = id
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst

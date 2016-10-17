@@ -140,15 +140,15 @@ func (node *DHTNode) initTaskQ() {
 					//node.improvePrintRing(node.msg)
 					//transport.send(&Msg{"printRing", "", v.Src, []byte("tjuuu")})
 				case "join":
-					node.findSucc(t.message)
+					go node.findSucc(t.message)
 				case "stabilize":
 					//			fmt.Println("stabilize case: ", node.nodeId)
-					node.stabilize()
+					go node.stabilize()
 				case "updateFingers":
-					node.updateNetworkFingers()
+					go node.updateNetworkFingers()
 				case "heartBeat":
 					//fmt.Println("initTask hearbeat")
-					node.heartBeat()
+					go node.heartBeat()
 				case "alive":
 					fmt.Println("fuck")
 				}
@@ -194,7 +194,9 @@ func (dhtnode *DHTNode) stableTimmer() {
 	for {
 		if dhtnode.alive {
 			time.Sleep(time.Millisecond * 5000)
-			dhtnode.createNewTask(nil, "stabilize")
+			go dhtnode.createNewTask(nil, "stabilize")
+		} else {
+			return
 		}
 	}
 }
