@@ -35,15 +35,16 @@ func (transport *Transport) listen() {
 }
 
 func (transport *Transport) send(msg *Msg) {
-	udpAddr, err := net.ResolveUDPAddr("udp", msg.Dst)
-	conn, err := net.DialUDP("udp", nil, udpAddr)
-	if err != nil {
-		fmt.Println("error SEND function is:", err)
+	if transport.node.alive {
+		udpAddr, err := net.ResolveUDPAddr("udp", msg.Dst)
+		conn, err := net.DialUDP("udp", nil, udpAddr)
+		if err != nil {
+			fmt.Println("error SEND function is:", err)
+		}
+		encoded, err := json.Marshal(msg)
+		defer conn.Close()
+		_, err = conn.Write(encoded)
 	}
-	encoded, err := json.Marshal(msg)
-	defer conn.Close()
-	_, err = conn.Write(encoded)
-
 }
 
 func (transport *Transport) initmsgQ() {
@@ -59,25 +60,43 @@ func (transport *Transport) initmsgQ() {
 				case "reply": //test
 					fmt.Println("hej:", string(msg.Bytes))
 				case "printRing":
-					transport.node.TaskQ <- &Task{msg, "printRing"} //transport.node.printRing()
+					go func() { transport.node.TaskQ <- &Task{msg, "printRing"} }() //transport.node.printRing()
 					//transport.send(&Msg{"ring", "", v.Src, []byte(transport.node.printRing())})
 				case "addToRing":
 					transport.node.printNetworkRing(msg)
 				case "response":
-					transport.node.responseQ <- msg
+					go func() { transport.node.responseQ <- msg }()
 				case "join":
-					transport.node.TaskQ <- &Task{msg, "join"}
+					go func() { transport.node.TaskQ <- &Task{msg, "join"} }()
 				case "notify":
 					//		fmt.Println("notify network")
-					transport.node.notifyNetwork(msg)
+					go transport.node.notifyNetwork(msg)
 				case "pred":
-					transport.node.getPred(msg)
+					go transport.node.getPred(msg)
 				case "lookup":
+					go transport.node.improvedNetworkLookUp(msg)
 					//fmt.Println("initmsgQ lookup: ")
-					go transport.node.networkLookup(msg)
+					//go transport.node.networkLookup(msg)
 				case "fingerLookup":
-					go transport.node.LookUpNetworkFinger(msg)
+					//go transport.node.LookUpNetworkFinger(msg)
 					//go transport.node.lookupFingers(msg)
+				case "heartBeat":
+					if transport.node.alive {
+						transport.node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
+					}
+				case "heartAnswer":
+					go func() { transport.node.heartBeatQ <- msg }()
+				case "isAlive":
+					if transport.node.alive {
+						transport.node.transport.send(responseMessage(msg.Dst, msg.Origin, transport.bindAddress, transport.node.nodeId))
+					}
+				case "nodeFound":
+					transport.node.transport.send(ackMsg(msg.Dst, msg.Origin))
+					go func() { transport.node.fingerQ <- &Finger{msg.Key, msg.Adress} }()
+				case "ack":
+					go func() { transport.node.responseQ <- msg }()
+				case "fingerStart":
+					go transport.node.setNetworkFingers(msg)
 				}
 			}
 		}
