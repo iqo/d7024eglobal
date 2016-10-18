@@ -25,7 +25,7 @@ type Finger struct {
 func (node *DHTNode) setNetworkFingers(msg *Msg) {
 	for i := 0; i < bits; i++ {
 
-		node.fingers.nodefingerlist[i] = &Finger{msg.liteNode.id, msg.liteNode.adress}
+		node.fingers.nodefingerlist[i] = &Finger{msg.Id, msg.Adress}
 		//id := node.nodeId
 		//adress := node.contact.ip + ":" + node.contact.port
 
