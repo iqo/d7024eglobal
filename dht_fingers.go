@@ -9,35 +9,36 @@ import (
 const bits int = 3
 
 /*type FingerTable struct{
-	nodefingerlist [bits]*DHTNode
+	Nodefingerlist [bits]*DHTNode
 }
 */
 
 type FingerTable struct {
-	nodefingerlist [bits]*Finger
+	Nodefingerlist [bits]*Finger
 }
 
 type Finger struct {
-	id     string
-	adress string
+	Id     string
+	Adress string
 }
 
 func (node *DHTNode) setNetworkFingers(msg *Msg) {
+	finger := &Finger{msg.LiteNode.Id, msg.LiteNode.Adress}
 	for i := 0; i < bits; i++ {
 
-		node.fingers.nodefingerlist[i] = &Finger{msg.Id, msg.Adress}
+		node.fingers.Nodefingerlist[i] = finger
 		//id := node.nodeId
 		//adress := node.contact.ip + ":" + node.contact.port
 
-		//node.fingers.nodefingerlist[i] = &FingerTable{id,adress,"","","","","",""}
-		//node.fingers.nodefingerlist[i] = &Finger{id, adress}
+		//node.fingers.Nodefingerlist[i] = &FingerTable{id,adress,"","","","","",""}
+		//node.fingers.Nodefingerlist[i] = &Finger{id, adress}
 	}
 }
 
 func (node *DHTNode) fingerTimer() {
 	for {
 		if node.alive {
-			time.Sleep(time.Second * 8)
+			time.Sleep(time.Second * 7)
 			node.createNewTask(nil, "updateFingers")
 		} else {
 			return
@@ -46,31 +47,30 @@ func (node *DHTNode) fingerTimer() {
 }
 
 func (node *DHTNode) updateNetworkFingers() {
-	node.PrintOutNetworkFingers()
 	//fmt.Println(node.contact.port, "updating fingers")
 	nodeAdress := node.contact.ip + ":" + node.contact.port
 	booleanResponseTest := false
 	for i := 0; i < bits; i++ {
-		if node.fingers.nodefingerlist[i] != nil {
+		if node.fingers.Nodefingerlist[i] != nil {
 			x, _ := hex.DecodeString(node.nodeId)
 			y, _ := calcFinger(x, (i + 1), bits)
-			if y == "" {
+			if y == " " {
 				y = "00"
 			}
 
 			//fmt.Println("update lookup")
-			fingerMsg := lookUpMessage(nodeAdress, y, nodeAdress, node.successor.adress)
+			fingerMsg := lookUpMessage(nodeAdress, y, nodeAdress, node.successor.Adress)
 			go node.transport.send(fingerMsg)
 			responseTimmer := time.NewTimer(time.Second * 3)
 			for booleanResponseTest != true {
 				select {
 
-				case responseCase := <-node.fingerQ:
-					fmt.Println("found", responseCase, "---")
-					node.fingers.nodefingerlist[i] = responseCase
-					//fmt.Println("wtf", node.fingers.nodefingerlist[i])
+				case responseCase := <-node.FingerQ:
+
+					node.fingers.Nodefingerlist[i] = responseCase
+					//fmt.Println("wtf", node.fingers.Nodefingerlist[i])
 					//createdFinger := &Finger{responseCase.id, responseCase.adress} //id eller key?
-					//node.fingers.nodefingerlist[i] = createdFinger
+					//node.fingers.Nodefingerlist[i] = createdFinger
 					booleanResponseTest = true
 
 				case <-responseTimmer.C:
@@ -85,9 +85,9 @@ func (node *DHTNode) updateNetworkFingers() {
 }
 
 func (node *DHTNode) PrintOutNetworkFingers() {
-	len_list := len(node.fingers.nodefingerlist)
+	len_list := len(node.fingers.Nodefingerlist)
 	for i := 0; i < len_list; i++ {
-		fmt.Println(node.fingers.nodefingerlist[i])
+		fmt.Println(node.fingers.Nodefingerlist[i])
 	}
 }
 
@@ -96,7 +96,7 @@ func (node *DHTNode) printNetworkFingers(msg *Msg) {
 		fmt.Println("finger for node: ", node.nodeId, "is <")
 		node.PrintOutNetworkFingers()
 		fmt.Println(">")
-		fingerPrintMsg := fingerPrintMessage(msg.Origin, node.successor.adress)
+		fingerPrintMsg := fingerPrintMessage(msg.Origin, node.successor.Adress)
 		go func() { node.transport.send(fingerPrintMsg) }()
 	} else {
 		fmt.Println("finger for node ", node.nodeId, "is <")
@@ -106,7 +106,7 @@ func (node *DHTNode) printNetworkFingers(msg *Msg) {
 }
 
 func (dhtnode *DHTNode) initPrintNetworkFingers(node *DHTNode) {
-	printMsg := fingerPrintMessage(dhtnode.transport.bindAddress, node.transport.bindAddress)
+	printMsg := fingerPrintMessage(dhtnode.transport.BindAddress, node.transport.BindAddress)
 	go func() {
 		dhtnode.transport.send(printMsg)
 	}()
@@ -122,7 +122,7 @@ func (dhtnode *DHTNode) initPrintNetworkFingers(node *DHTNode) {
 
 func (dhtnode *DHTNode) LookUpNetworkFinger(msg *Msg) {
 	srcAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
-	tempFingerTable := dhtnode.fingers.nodefingerlist
+	tempFingerTable := dhtnode.fingers.Nodefingerlist
 	lenOfFingerTable := len(tempFingerTable)
 
 	for i := lenOfFingerTable; i > 0; i-- {

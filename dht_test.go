@@ -3,7 +3,7 @@ package dht
 //go test -test.run TestDHT1
 
 import (
-	//"fmt"
+	"fmt"
 	"testing"
 	"time"
 )
@@ -50,8 +50,8 @@ func TestDHT2(t *testing.T) {
 	//	fmt.Println("TEST: " + node1.lookup(key1).nodeId + " is responsible for " + key1)
 	//	fmt.Println("TEST: " + node1.lookup(key2).nodeId + " is responsible for " + key2)
 	//	fmt.Println("TEST: " + node1.lookup(key3).nodeId + " is responsible for " + key3)
-
 	node1.start_server()
+	node1.setNetworkFingers(&Msg{"", "", "", "", nil, &LiteNodeStruct{node1.successor.Adress, node1.successor.NodeId}, ""})
 	node2.start_server()
 	node3.start_server()
 	node7.start_server()
@@ -59,15 +59,19 @@ func TestDHT2(t *testing.T) {
 
 	src := node1.contact.ip + ":" + node1.contact.port
 	//dst := node2.contact.ip + ":" + node2.contact.port
-	master := &tinyNode{node1.nodeId, src}
+	Master := &TinyNode{node1.nodeId, src}
+
 	//node1.PrintRingProc()
-	node2.join(master)
-	node3.join(master)
-	node0.join(master)
-	node7.join(master)
+	node2.join(Master)
+	node3.join(Master)
+	node0.join(Master)
+	node7.join(Master)
 	//node1.isTheNodeAlive()
 	//node1.killTheNode()
-	time.Sleep(time.Second * 5)
+	time.Sleep(time.Second * 15)
+	node1.initPrintNetworkFingers(node2)
+	time.Sleep(time.Second * 30)
+	node1.initPrintNetworkFingers(node2)
 	//node1.PrintOutNetworkFingers()
 	//node1.isTheNodeAlive()
 
@@ -83,4 +87,15 @@ func TestDHT2(t *testing.T) {
 
 	time.Sleep(2000 * time.Second)
 
+}
+
+func TestDHT3(t *testing.T) {
+	list := [3]string{"ett", "två", "tre"}
+	fmt.Println(list)
+	for _, key := range list {
+		fmt.Println("range ", key)
+	}
+	for i := 0; i < len(list); i++ {
+		fmt.Println("len", list[i])
+	}
 }

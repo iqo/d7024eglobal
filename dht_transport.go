@@ -7,14 +7,14 @@ import (
 )
 
 type Transport struct {
-	node        *DHTNode
-	bindAddress string // rad 20, bindadress måste finnas.
+	Node        *DHTNode
+	BindAddress string // rad 20, bindadress måste finnas.
 	msgQ        chan *Msg
 }
 
 func (transport *Transport) listen() {
-	udpAddr, err := net.ResolveUDPAddr("udp", transport.bindAddress)
-	//	fmt.Println("transport bindaddress:", transport.bindAddress)
+	udpAddr, err := net.ResolveUDPAddr("udp", transport.BindAddress)
+	//	fmt.Println("transport bindaddress:", transport.BindAddress)
 	conn, err := net.ListenUDP("udp", udpAddr)
 	conn.SetReadBuffer(10000)
 	conn.SetWriteBuffer(10000)
@@ -35,7 +35,7 @@ func (transport *Transport) listen() {
 }
 
 func (transport *Transport) send(msg *Msg) {
-	if transport.node.alive {
+	if transport.Node.alive {
 		udpAddr, err := net.ResolveUDPAddr("udp", msg.Dst)
 		conn, err := net.DialUDP("udp", nil, udpAddr)
 		if err != nil {
@@ -54,49 +54,54 @@ func (transport *Transport) initmsgQ() {
 			case msg := <-transport.msgQ:
 				switch msg.Type {
 				case "fingerPrint": //test case
-					transport.node.printNetworkFingers(msg)
-					//transport.node.TaskQ <- &Task{msg, "printRingFingers"}
+					transport.Node.printNetworkFingers(msg)
+					//transport.Node.TaskQ <- &Task{msg, "printRingFingers"}
 				//	transport.send(&Msg{"printRing", "", v.Src, []byte("tjuuu")})
 				case "reply": //test
 					fmt.Println("hej:", string(msg.Bytes))
 				case "printRing":
-					go func() { transport.node.TaskQ <- &Task{msg, "printRing"} }() //transport.node.printRing()
-					//transport.send(&Msg{"ring", "", v.Src, []byte(transport.node.printRing())})
+					go func() { transport.Node.TaskQ <- &Task{msg, "printRing"} }() //transport.Node.printRing()
+					//transport.send(&Msg{"ring", "", v.Src, []byte(transport.Node.printRing())})
 				case "addToRing":
-					transport.node.printNetworkRing(msg)
+					transport.Node.printNetworkRing(msg)
 				case "response":
-					go func() { transport.node.responseQ <- msg }()
+					go func() { transport.Node.ResponseQ <- msg }()
 				case "join":
-					go func() { transport.node.TaskQ <- &Task{msg, "join"} }()
+					go func() { transport.Node.TaskQ <- &Task{msg, "join"} }()
 				case "notify":
 					//		fmt.Println("notify network")
-					go transport.node.notifyNetwork(msg)
+					go transport.Node.notifyNetwork(msg)
 				case "pred":
-					go transport.node.getPred(msg)
+					go transport.Node.getPred(msg)
 				case "lookup":
-					go transport.node.improvedNetworkLookUp(msg)
+					//fmt.Println("lookup transport ", msg)
+					go transport.Node.transport.send(LookAckMessage(msg.Dst, msg.Src))
+					go transport.Node.improvedNetworkLookUp(msg)
 					//fmt.Println("initmsgQ lookup: ")
-					//go transport.node.networkLookup(msg)
+					//go transport.Node.networkLookup(msg)
 				case "fingerLookup":
-					//go transport.node.LookUpNetworkFinger(msg)
-					//go transport.node.lookupFingers(msg)
+					//go transport.Node.LookUpNetworkFinger(msg)
+					//go transport.Node.lookupFingers(msg)
 				case "heartBeat":
-					if transport.node.alive {
-						transport.node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
+					if transport.Node.alive {
+						transport.Node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
 					}
 				case "heartAnswer":
-					go func() { transport.node.heartBeatQ <- msg }()
+					go func() { transport.Node.HeartBeatQ <- msg }()
 				case "isAlive":
-					if transport.node.alive {
-						transport.node.transport.send(responseMessage(msg.Dst, msg.Origin, transport.bindAddress, transport.node.nodeId))
+					if transport.Node.alive {
+						transport.Node.transport.send(responseMessage(msg.Dst, msg.Origin, transport.BindAddress, transport.Node.nodeId))
 					}
 				case "nodeFound":
-					transport.node.transport.send(ackMsg(msg.Dst, msg.Origin))
-					go func() { transport.node.fingerQ <- &Finger{msg.Key, msg.Adress} }()
+					go func() {
+						transport.Node.FingerQ <- &Finger{msg.LiteNode.Id, msg.LiteNode.Adress} /*<- &Finger{msg.LiteNode.id, msg.LiteNode.adress}*/
+					}()
 				case "ack":
-					go func() { transport.node.responseQ <- msg }()
+					go func() { transport.Node.ResponseQ <- msg }()
 				case "fingerStart":
-					go transport.node.setNetworkFingers(msg)
+					go transport.Node.setNetworkFingers(msg)
+				case "lockAck":
+					go func() { transport.Node.NodeLookQ <- msg }()
 				}
 			}
 		}
