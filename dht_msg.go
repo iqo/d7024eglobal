@@ -5,13 +5,11 @@ import (
 )
 
 type Msg struct {
-	Origin string
-	Key    string //värdet
-	Src    string //från noden som kalla
-	Dst    string //destinationsadress
-	Bytes  []byte //transport funktionen, msg.Bytes
-	//Adress   string replaced by litenode
-	//Id       string replaced by litenode
+	Origin   string
+	Key      string //värdet
+	Src      string //från noden som kalla
+	Dst      string //destinationsadress
+	Bytes    []byte //transport funktionen, msg.Bytes
 	LiteNode *LiteNodeStruct
 	Type     string // type of message thats is being sent
 }

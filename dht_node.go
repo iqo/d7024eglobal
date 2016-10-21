@@ -246,14 +246,6 @@ func (dhtnode *DHTNode) killTheNode() {
 	dhtnode.predecessor.NodeId = ""
 }
 
-/*func (dhtnode *DHTNode) isTheNodeAlive() bool {
-	if dhtnode.alive {
-		return true
-	} else {
-		return false
-	}
-}*/
-
 func (dhtnode *DHTNode) updateSucc(key string) {
 	tempFinger := &Finger{dhtnode.successor.NodeId, dhtnode.successor.Adress}
 	dhtAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
