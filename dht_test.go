@@ -13,6 +13,8 @@ func TestDHT2(t *testing.T) {
 	id2 := "02"
 	id3 := "03"
 	id4 := "04"
+	id5 := "05"
+	id6 := "06"
 	id7 := "07"
 	id0 := "00"
 
@@ -20,9 +22,9 @@ func TestDHT2(t *testing.T) {
 	node1 := makeDHTNode(&id1, "localhost", "1111")
 	node2 := makeDHTNode(&id2, "localhost", "1112")
 	node3 := makeDHTNode(&id3, "localhost", "1113")
-	node4 := makeDHTNode(&id4, "localhost", "1114")
-	//	node5 := makeDHTNode(nil, "localhost", "1115")
-	//	node6 := makeDHTNode(nil, "localhost", "1116")
+	node4 := makeDHTNode(&id4, "localhost", "1114") //listen node do not start
+	node5 := makeDHTNode(&id5, "localhost", "1115")
+	node6 := makeDHTNode(&id6, "localhost", "1116")
 	node7 := makeDHTNode(&id7, "localhost", "1117")
 
 	/*node0 := makeDHTNode(nil, "localhost", "1110")
@@ -56,22 +58,35 @@ func TestDHT2(t *testing.T) {
 	node3.start_server()
 	node7.start_server()
 	node0.start_server()
+	node5.start_server()
+	node6.start_server()
+	time.Sleep(time.Second * 3)
 
 	src := node1.contact.ip + ":" + node1.contact.port
 	//dst := node2.contact.ip + ":" + node2.contact.port
 	Master := &TinyNode{node1.nodeId, src}
 
 	//node1.PrintRingProc()
+
 	node2.join(Master)
 	node3.join(Master)
-	node0.join(Master)
 	node7.join(Master)
+	node0.join(Master)
+	node6.join(Master)
+	node5.join(Master)
 	//node1.isTheNodeAlive()
 	//node1.killTheNode()
-	time.Sleep(time.Second * 15)
+	time.Sleep(time.Second * 10)
+	fmt.Println("")
 	node1.initPrintNetworkFingers(node2)
-	time.Sleep(time.Second * 30)
-	node1.initPrintNetworkFingers(node2)
+	fmt.Println("")
+	time.Sleep(time.Second * 10)
+	//node3.killTheNode()
+	//node5.killTheNode()
+	time.Sleep(time.Second * 10)
+	fmt.Println("")
+	node2.initPrintNetworkFingers(node5)
+	fmt.Println("")
 	//node1.PrintOutNetworkFingers()
 	//node1.isTheNodeAlive()
 

@@ -145,12 +145,15 @@ func (node *DHTNode) initTaskQ() {
 					go node.findSucc(t.Message)
 				case "stabilize":
 					//			fmt.Println("stabilize case: ", node.nodeId)
-					go node.stabilize()
+					//go node.stabilize()
+					node.stabilize()
 				case "updateFingers":
 					go node.updateNetworkFingers()
+					//go node.updateNetworkFingers()
 				case "heartBeat":
 					//fmt.Println("initTask hearbeat")
-					go node.heartBeat()
+					//go node.heartBeat()
+					node.heartBeat()
 				case "alive":
 					fmt.Println("fuck")
 				}
@@ -183,7 +186,7 @@ func (node *DHTNode) stabilize() {
 			//	fmt.Println("node id:", node.nodeId, "node successor id:", node.successor, "node predecessor id:", node.predecessor)
 			return
 		case timer := <-time.C: //timer
-			fmt.Println("TIMER ERROR:", timer)
+			fmt.Println("Stabilize timeout error updating suscessor:", timer)
 			node.updateSucc(node.successor.NodeId)
 			return
 		}
@@ -240,10 +243,10 @@ func (node *DHTNode) PrintRingProc() {
 func (dhtnode *DHTNode) killTheNode() {
 	fmt.Println("killing node ", dhtnode.nodeId)
 	dhtnode.alive = false
-	dhtnode.successor.NodeId = ""
+	/*dhtnode.successor.NodeId = ""
 	dhtnode.successor.Adress = ""
 	dhtnode.predecessor.Adress = ""
-	dhtnode.predecessor.NodeId = ""
+	dhtnode.predecessor.NodeId = ""*/
 }
 
 func (dhtnode *DHTNode) updateSucc(key string) {

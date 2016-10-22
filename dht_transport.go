@@ -24,12 +24,15 @@ func (transport *Transport) listen() {
 	defer conn.Close()
 	dec := json.NewDecoder(conn)
 	for {
-		msg := Msg{}
-		err = dec.Decode(&msg)
-		go func() {
-			transport.msgQ <- &msg
-		}()
-
+		if transport.Node.alive {
+			msg := Msg{}
+			err = dec.Decode(&msg)
+			go func() {
+				transport.msgQ <- &msg
+			}()
+		} else {
+			return
+		}
 	}
 
 }
@@ -84,7 +87,8 @@ func (transport *Transport) initmsgQ() {
 					//go transport.Node.lookupFingers(msg)
 				case "heartBeat":
 					if transport.Node.alive {
-						transport.Node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
+						transport.Node.transport.send(heartBeatAnswer(msg.Dst, msg.Origin))
+						//transport.Node.transport.send(heartBeatAnswer(msg.Origin, msg.Dst))
 					}
 				case "heartAnswer":
 					go func() { transport.Node.HeartBeatQ <- msg }()

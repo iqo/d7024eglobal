@@ -27,11 +27,6 @@ func (node *DHTNode) setNetworkFingers(msg *Msg) {
 	for i := 0; i < bits; i++ {
 
 		node.fingers.Nodefingerlist[i] = finger
-		//id := node.nodeId
-		//adress := node.contact.ip + ":" + node.contact.port
-
-		//node.fingers.Nodefingerlist[i] = &FingerTable{id,adress,"","","","","",""}
-		//node.fingers.Nodefingerlist[i] = &Finger{id, adress}
 	}
 }
 
