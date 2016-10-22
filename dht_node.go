@@ -125,9 +125,9 @@ func (dhtNode *DHTNode) start_server() {
 }
 
 func (dhtNode *DHTNode) notifyNetwork(msg *Msg) {
-	if (dhtNode.predecessor.Adress == "") || between([]byte(dhtNode.predecessor.NodeId), []byte(dhtNode.nodeId), []byte(msg.Key)) {
-		dhtNode.predecessor.Adress = msg.Src
-		dhtNode.predecessor.NodeId = msg.Key
+	if (dhtNode.predecessor.Adress == "") || between([]byte(dhtNode.predecessor.NodeId), []byte(dhtNode.nodeId), []byte(msg.LiteNode.Id)) {
+		dhtNode.predecessor.Adress = msg.LiteNode.Adress
+		dhtNode.predecessor.NodeId = msg.LiteNode.Id
 	}
 }
 
@@ -166,7 +166,7 @@ func (node *DHTNode) stabilize() {
 	nodeAdress := node.contact.ip + ":" + node.contact.port
 	predOfSucc := getPredMessage(nodeAdress, node.successor.Adress) // id eller adress?
 	go node.transport.send(predOfSucc)
-	time := time.NewTimer(time.Millisecond * 1000)
+	time := time.NewTimer(time.Millisecond * 2000)
 	for {
 		select {
 		case r := <-node.ResponseQ:
@@ -270,10 +270,20 @@ func (dhtnode *DHTNode) updateSucc(key string) {
 			dhtnode.successor.NodeId = tempFinger.Id
 			notifyMsg := notifyMessage(dhtAdress, tempFinger.Adress, dhtAdress, dhtnode.nodeId)
 			go dhtnode.transport.send(notifyMsg)
+			return
 
 		case <-timerResp.C:
 			dhtnode.updateSucc(tempFinger.Id)
 			return
 		}
+	}
+}
+
+func (dhtnode *DHTNode) bringNodeBack(master *TinyNode) {
+	if dhtnode.alive == false {
+		dhtnode.alive = true
+		dhtnode.start_server()
+		dhtnode.join(master)
+		fmt.Println("node ", dhtnode.nodeId, "rejoining the ring ")
 	}
 }

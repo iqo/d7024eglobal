@@ -33,7 +33,7 @@ func (dhtnode *DHTNode) initNetworkLookUp(key string) {
 
 func (dhtnode *DHTNode) improvedNetworkLookUp(msg *Msg) {
 	NodeAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
-	timeResp := time.NewTimer(time.Second * 1)
+	timeResp := time.NewTimer(time.Millisecond * 300)
 
 	if dhtnode.resposibleNetworkNode(msg.Key) {
 		nodeFoundMsg := nodeFoundMessage(NodeAdress, msg.Origin, NodeAdress, dhtnode.nodeId)
@@ -42,7 +42,7 @@ func (dhtnode *DHTNode) improvedNetworkLookUp(msg *Msg) {
 	} else {
 		lookUpMsg := lookUpMessage(msg.Origin, msg.Key, NodeAdress, dhtnode.successor.Adress)
 		go dhtnode.transport.send(lookUpMsg)
-		timeResp.Reset(time.Second * 1)
+		timeResp.Reset(time.Millisecond * 300)
 
 		for {
 			select {
@@ -86,3 +86,19 @@ func (dhtnode *DHTNode) findNextAlive(fing *Finger) string {
 	}
 
 }
+
+/*func (dhtnode *DHTNode) lookUpNetworkFinger(msg *Msg) {
+	nodeadress := dhtnode.contact.ip + ":" + dhtnode.contact.port
+	temTable := dhtnode.fingers.Nodefingerlist
+	lenOfFingerTable := len(temTable)
+
+	for i := 0; i<lenOfFingerTable; i--{
+		if !(between([]byte(dhtnode.nodeId), []byte(temTable[i].Id), []byte(msg.Key)))
+		lookUpMsg := fingerLookUpMessage(msg.Origin, msg.Key, nodeadress, temTable[i-1].Adress)
+		go func () {
+			dhtnode.transport.send(msg)
+		}
+		return
+	}
+	foundMsg := nodeFoundMessage(nodeadress, msg.Origin, dhtnode.successor.Adress, dhtnode.successor.NodeId)
+}*/
