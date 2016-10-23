@@ -280,9 +280,12 @@ func (dhtnode *DHTNode) updateSucc(key string) {
 }
 
 func (dhtnode *DHTNode) bringNodeBack(master *TinyNode) {
+	src2 := dhtnode.contact.ip + ":" + dhtnode.contact.port
 	if dhtnode.alive == false {
 		dhtnode.alive = true
 		dhtnode.start_server()
+		dhtnode.successor.NodeId = dhtnode.nodeId
+		dhtnode.successor.Adress = src2
 		master.NodeId = dhtnode.nodeId
 		master.Adress = src2
 		dhtnode.join(master)

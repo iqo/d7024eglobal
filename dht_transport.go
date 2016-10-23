@@ -83,7 +83,7 @@ func (transport *Transport) initmsgQ() {
 					//fmt.Println("initmsgQ lookup: ")
 					//go transport.Node.networkLookup(msg)
 				case "fingerLookup":
-					//go transport.Node.LookUpNetworkFinger(msg)
+					go transport.Node.lookUpNetworkFinger(msg)
 					//go transport.Node.lookupFingers(msg)
 				case "heartBeat":
 					if transport.Node.alive {
@@ -104,7 +104,7 @@ func (transport *Transport) initmsgQ() {
 					go func() { transport.Node.ResponseQ <- msg }()
 				case "fingerStart":
 					go transport.Node.setNetworkFingers(msg)
-				case "lockAck":
+				case "LookAck":
 					go func() { transport.Node.NodeLookQ <- msg }()
 				}
 			}

@@ -25,6 +25,7 @@ func (dhtnode *DHTNode) initNetworkLookUp(key string) {
 	nodeadress := dhtnode.contact.ip + ":" + dhtnode.contact.port
 	if dhtnode.resposibleNetworkNode(key) {
 		dhtnode.FingerQ <- &Finger{dhtnode.nodeId, nodeadress}
+		fmt.Println("key")
 	} else {
 		lookUpMsg := lookUpMessage(nodeadress, key, nodeadress, dhtnode.successor.Adress)
 		go dhtnode.transport.send(lookUpMsg)
@@ -47,6 +48,7 @@ func (dhtnode *DHTNode) improvedNetworkLookUp(msg *Msg) {
 		for {
 			select {
 			case <-dhtnode.NodeLookQ:
+				//fmt.Println("node id", msg.Src)
 				return
 
 			case <-timeResp.C:
@@ -87,18 +89,31 @@ func (dhtnode *DHTNode) findNextAlive(fing *Finger) string {
 
 }
 
-/*func (dhtnode *DHTNode) lookUpNetworkFinger(msg *Msg) {
+func (dhtnode *DHTNode) lookUpNetworkFinger(msg *Msg) {
+	//fmt.Println("msg look ", msg)
 	nodeadress := dhtnode.contact.ip + ":" + dhtnode.contact.port
 	temTable := dhtnode.fingers.Nodefingerlist
 	lenOfFingerTable := len(temTable)
 
-	for i := 0; i<lenOfFingerTable; i--{
-		if !(between([]byte(dhtnode.nodeId), []byte(temTable[i].Id), []byte(msg.Key)))
-		lookUpMsg := fingerLookUpMessage(msg.Origin, msg.Key, nodeadress, temTable[i-1].Adress)
-		go func () {
-			dhtnode.transport.send(msg)
+	for i := 0; i > lenOfFingerTable; i-- {
+		nodeBetween := (between([]byte(dhtnode.nodeId), []byte(temTable[i-1].Id), []byte(msg.Key)))
+		if nodeBetween != true {
+			fmt.Println("not true")
+			//lookUpMsg := lookUpMessage(msg.Origin, msg.Key, nodeadress, temTable[i-1].Adress)
+
+			lookUpMsg := fingerLookUpMessage(msg.Origin, msg.Key, nodeadress, temTable[i-1].Adress)
+			go func() { dhtnode.transport.send(lookUpMsg) }()
+			return
 		}
-		return
 	}
 	foundMsg := nodeFoundMessage(nodeadress, msg.Origin, dhtnode.successor.Adress, dhtnode.successor.NodeId)
-}*/
+	go func() { dhtnode.transport.send(foundMsg) }()
+	//fmt.Println(dhtnode.successor.Adress)
+	//fmt.Println(dhtnode.successor.NodeId)
+	return
+}
+
+func (masterDhtNode *DHTNode) initLookUpNetworkFinger(key string, dhtnode *DHTNode) {
+	fingerLookMsg := fingerLookUpMessage(masterDhtNode.transport.BindAddress, key, masterDhtNode.transport.BindAddress, dhtnode.transport.BindAddress)
+	go func() { dhtnode.transport.send(fingerLookMsg) }()
+}
