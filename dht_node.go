@@ -283,6 +283,8 @@ func (dhtnode *DHTNode) bringNodeBack(master *TinyNode) {
 	if dhtnode.alive == false {
 		dhtnode.alive = true
 		dhtnode.start_server()
+		master.NodeId = dhtnode.nodeId
+		master.Adress = src2
 		dhtnode.join(master)
 		fmt.Println("node ", dhtnode.nodeId, "rejoining the ring ")
 	}
