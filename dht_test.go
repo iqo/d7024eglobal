@@ -115,12 +115,8 @@ func TestDHT2(t *testing.T) {
 }
 
 func TestDHT3(t *testing.T) {
-	list := [3]string{"ett", "två", "tre"}
-	fmt.Println(list)
-	for _, key := range list {
-		fmt.Println("range ", key)
-	}
-	for i := 0; i < len(list); i++ {
-		fmt.Println("len", list[i])
-	}
+	p1 := &Page{Title: "TestPage", Body: []byte("This is a sample Page.")}
+	p1.save()
+	p2, _ := loadPage("TestPage")
+	fmt.Println(string(p2.Body))
 }

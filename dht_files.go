@@ -1,7 +1,13 @@
 package dht
 
 import (
-//"encoding/hex"
-//"fmt"
-//"time"
+	//"encoding/hex"
+	"fmt"
+	"net/http"
+	"os"
+	"io/ioutil"
 )
+
+func doesFileExits bool (){
+
+}
