@@ -5,13 +5,15 @@ import (
 )
 
 type Msg struct {
-	Origin   string
-	Key      string //värdet
-	Src      string //från noden som kalla
-	Dst      string //destinationsadress
-	Bytes    []byte //transport funktionen, msg.Bytes
+	Origin string
+	Key    string //värdet
+	Src    string //från noden som kalla
+	Dst    string //destinationsadress
+	//Bytes    string //transport funktionen, msg.Bytes
+	Bytes    string
 	LiteNode *LiteNodeStruct
 	Type     string // type of message thats is being sent
+	FileName string
 }
 
 type LiteNodeStruct struct {
@@ -19,7 +21,7 @@ type LiteNodeStruct struct {
 	Id     string
 }
 
-func message(t, origin, dst, src, key string, bytes []byte) *Msg {
+func message(t, origin, dst, src, key string, bytes string) *Msg {
 	msg := &Msg{}
 	msg.Type = t
 	msg.LiteNode = &LiteNodeStruct{"", ""}
@@ -42,7 +44,7 @@ func joinMessage(dst string) *Msg {
 	msg.Origin = "" //origin?
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	//msg.Key = key
 	return msg
 }
@@ -56,7 +58,7 @@ func printMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	//msg.Key = key
 	return msg
 }
@@ -72,7 +74,7 @@ func notifyMessage(src, dst, adress, id string) *Msg {
 	msg.Key = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -83,7 +85,7 @@ func getPredMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -96,7 +98,7 @@ func responseMessage(src, dst, adress, id string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -110,7 +112,7 @@ func lookUpMessage(origin, key, src, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -124,7 +126,7 @@ func fingerLookUpMessage(origin, key, src, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -138,7 +140,7 @@ func fingerPrintMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -152,7 +154,7 @@ func heartBeatMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -166,7 +168,7 @@ func heartBeatAnswer(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -179,7 +181,7 @@ func AliveMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -190,7 +192,7 @@ func nodeFoundMessage(origin, dst, adress, key string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -203,7 +205,7 @@ func ackMsg(src, dst string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 
@@ -214,7 +216,7 @@ func fingerStartMessage(src, dst, adress, id string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }
 func LookAckMessage(src, dst string) *Msg {
@@ -224,6 +226,6 @@ func LookAckMessage(src, dst string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = nil
+	msg.Bytes = ""
 	return msg
 }

@@ -1,7 +1,8 @@
 package dht
 
-/*import (
+import (
 	//"encoding/hex"
+	b64 "encoding/base64"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -42,15 +43,24 @@ func errorChecker(e error) {
 	}
 }
 
-func (dhtnode *DHTNode) initUpload(msg *Msg) {
-	if dhtnode.resposibleNetworkNode(msg.key) {
-		data := strings.Split(msg.Bytes, ";")
-		dataInFile := ""
-		for _, tempData := range data[1:] {
-			dataInFile = dataInFile + tempData
-		}
-		dhtnode.uploadFile(filePath, key, value)
-
+func (dhtnode *DHTNode) createFolder() {
+	path := "folder/" + dhtnode.nodeId
+	if !fileAlreadyExits(path) {
+		os.MkdirAll(path, 0777)
 	}
 }
-*/
+
+func (dhtnode *DHTNode) initUpload(msg *Msg) {
+	nodeid := improvedGenerateNodeId(msg.Dst)
+	nodeIdForSuccessor := improvedGenerateNodeId(dhtnode.successor.Adress)
+	desiredPath := "storage/" + nodeid + "/"
+
+	if fileAlreadyExits(desiredPath) != true {
+		os.Mkdir(desiredPath, 077)
+	}
+	FName, _ := b64.StdEncoding.DecodeString(msg.FileName)
+	FData, _ := b64.StdEncoding.DecodeString(msg.Bytes)
+	desiredPath = "storage/" + nodeid + "/" + string(FName)
+	createFile(desiredPath, string(FName))
+
+}
