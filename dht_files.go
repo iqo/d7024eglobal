@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	//"net/http"
 	"os"
+	"time"
 	//"strings"
 )
 
@@ -19,8 +20,8 @@ func createFile(path, value string) {
 }
 
 func fileAlreadyExits(name string) bool {
-	_, err := os.Stat(name)
-	if err != nil {
+	//_, err := os.Stat(name)
+	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
 			return false
 		}
@@ -28,12 +29,12 @@ func fileAlreadyExits(name string) bool {
 	return true
 }
 
-func (dhtnode *DHTNode) uploadFile(filePath, key, value string) {
+/*func (dhtnode *DHTNode) uploadFile(filePath, key, value string) {
 	if fileAlreadyExits(filePath) != true {
 		os.Mkdir(filePath, 0777)
 	}
 	createFile(filePath+key, value)
-}
+}*/
 
 func errorChecker(e error) {
 	if e != nil {
@@ -51,7 +52,7 @@ func (dhtnode *DHTNode) createFolder() {
 	}
 }
 
-func (dhtnode *DHTNode) initUpload(msg *Msg) {
+func (dhtnode *DHTNode) upload(msg *Msg) {
 	defaultPath := "storage/"
 	storagePath := defaultPath + dhtnode.nodeId + "/"
 
@@ -102,4 +103,41 @@ func (dhtnode *DHTNode) replicator(msg *Msg) {
 		createFile(SeconddaryStoragePath, string(StringFileData))
 	}
 
+}
+
+func (dhtnode *DHTNode) responsible(filename, data string) {
+	respTimer := time.NewTimer(time.Second * 2)
+	FName, _ := b64.StdEncoding.DecodeString(filename)
+	generatedHash := improvedGenerateNodeId(string(FName))
+	dhtnode.initNetworkLookUp(generatedHash)
+	for {
+		select {
+		case fingerResp := <-dhtnode.FingerQ:
+			fmt.Println("uploading file to folder", fingerResp.Id)
+			upLoadMsg := UpLoadMessage(dhtnode.transport.BindAddress, fingerResp.Adress, filename, data)
+			go func() { dhtnode.transport.send(upLoadMsg) }()
+			return
+		case <-respTimer.C:
+			return
+		}
+	}
+}
+
+func initFileUpload(dhtnode *DHTNode) {
+	//filePath := "C:\Users\Niklas\gocode\github\Mox_D7024E\github.com\d7024eglobal\readme" //fuck windows
+	//filePath := "C/Users/Niklas/gocode/github/Mox_D7024E/github.com/d7024eglobal/readme"
+	filePath := "readme/"
+	filesInPath, err := ioutil.ReadDir(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, temp := range filesInPath {
+		readFile, _ := ioutil.ReadFile(filePath + temp.Name())
+
+		stringFile := b64.StdEncoding.EncodeToString([]byte(temp.Name()))
+		stringData := b64.StdEncoding.EncodeToString(readFile)
+
+		dhtnode.responsible(stringFile, stringData)
+	}
 }
