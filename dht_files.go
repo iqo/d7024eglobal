@@ -85,15 +85,18 @@ func (dhtnode *DHTNode) upload(msg *Msg) {
 func (dhtnode *DHTNode) replicator(msg *Msg) {
 	generatedId := improvedGenerateNodeId(msg.Origin)
 	defaultPath := "storage/"
+
 	storagePath := defaultPath + dhtnode.nodeId + "/" + generatedId + "/"
 	if !fileAlreadyExits(storagePath) {
 		os.MkdirAll(storagePath, 077)
 	}
 
-	StringFileName := b64.StdEncoding.EncodeToString([]byte(msg.FileName))
-	StringFileData := b64.StdEncoding.EncodeToString([]byte(msg.Data))
+	StringFileName, _ := b64.StdEncoding.DecodeString(msg.FileName)
+	StringFileData, _ := b64.StdEncoding.DecodeString(msg.Data)
+	//StringFileName := b64.StdEncoding.EncodeToString([]byte(msg.FileName))
+	//StringFileData := b64.StdEncoding.EncodeToString([]byte(msg.Data))
 
-	SeconddaryStoragePath := defaultPath + "/" + dhtnode.nodeId + "/" + string(StringFileName)
+	SeconddaryStoragePath := defaultPath + "/" + dhtnode.nodeId + "/" + generatedId + string(StringFileName)
 
 	_, err := os.Stat(SeconddaryStoragePath)
 	if err == nil {
