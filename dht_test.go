@@ -53,7 +53,7 @@ func TestDHT2(t *testing.T) {
 	//	fmt.Println("TEST: " + node1.lookup(key2).nodeId + " is responsible for " + key2)
 	//	fmt.Println("TEST: " + node1.lookup(key3).nodeId + " is responsible for " + key3)
 	node1.start_server()
-	node1.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{node1.successor.Adress, node1.successor.NodeId}, ""})
+	node1.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{node1.successor.Adress, node1.successor.NodeId}, "", ""})
 	node2.start_server()
 	node3.start_server()
 	node7.start_server()

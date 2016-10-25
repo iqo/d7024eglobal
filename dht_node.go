@@ -25,7 +25,7 @@ type DHTNode struct {
 	HeartBeatQ  chan *Msg
 	FingerQ     chan *Finger
 	NodeLookQ   chan *Msg
-	//path        string
+	//Path        string
 	alive bool
 }
 type TinyNode struct {
@@ -83,7 +83,7 @@ func (dhtNode *DHTNode) join(master *TinyNode) {
 			dhtNode.successor.Adress = r.Src
 			dhtNode.successor.NodeId = r.Key
 
-			dhtNode.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{dhtNode.successor.Adress, dhtNode.successor.NodeId}, ""})
+			dhtNode.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{dhtNode.successor.Adress, dhtNode.successor.NodeId}, "", ""})
 			fingerStart := fingerStartMessage(src, dhtNode.successor.Adress, dhtNode.transport.BindAddress, dhtNode.nodeId)
 			fmt.Println("fingerstart join: ", fingerStart)
 			go func() { dhtNode.transport.send(fingerStart) }()

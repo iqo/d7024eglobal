@@ -9,8 +9,8 @@ type Msg struct {
 	Key    string //värdet
 	Src    string //från noden som kalla
 	Dst    string //destinationsadress
-	//Bytes    string //transport funktionen, msg.Bytes
-	Bytes    string
+	//Data    string //transport funktionen, msg.Data
+	Data     string
 	LiteNode *LiteNodeStruct
 	Type     string // type of message thats is being sent
 	FileName string
@@ -21,7 +21,7 @@ type LiteNodeStruct struct {
 	Id     string
 }
 
-func message(t, origin, dst, src, key string, bytes string) *Msg {
+func message(t, origin, dst, src, key string, Data string) *Msg {
 	msg := &Msg{}
 	msg.Type = t
 	msg.LiteNode = &LiteNodeStruct{"", ""}
@@ -30,7 +30,7 @@ func message(t, origin, dst, src, key string, bytes string) *Msg {
 	msg.Origin = origin
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = bytes
+	msg.Data = Data
 	msg.Key = key
 	return msg
 }
@@ -44,7 +44,7 @@ func joinMessage(dst string) *Msg {
 	msg.Origin = "" //origin?
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	//msg.Key = key
 	return msg
 }
@@ -58,7 +58,7 @@ func printMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	//msg.Key = key
 	return msg
 }
@@ -74,7 +74,7 @@ func notifyMessage(src, dst, adress, id string) *Msg {
 	msg.Key = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -85,7 +85,7 @@ func getPredMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -98,7 +98,7 @@ func responseMessage(src, dst, adress, id string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -112,7 +112,7 @@ func lookUpMessage(origin, key, src, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -126,7 +126,7 @@ func fingerLookUpMessage(origin, key, src, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -140,7 +140,7 @@ func fingerPrintMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -154,7 +154,7 @@ func heartBeatMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -168,7 +168,7 @@ func heartBeatAnswer(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -181,7 +181,7 @@ func AliveMessage(origin, dst string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -192,7 +192,7 @@ func nodeFoundMessage(origin, dst, adress, key string) *Msg {
 	msg.Origin = origin
 	msg.Src = ""
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -205,7 +205,7 @@ func ackMsg(src, dst string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 
@@ -216,7 +216,7 @@ func fingerStartMessage(src, dst, adress, id string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
 	return msg
 }
 func LookAckMessage(src, dst string) *Msg {
@@ -226,6 +226,30 @@ func LookAckMessage(src, dst string) *Msg {
 	msg.Origin = ""
 	msg.Src = src
 	msg.Dst = dst
-	msg.Bytes = ""
+	msg.Data = ""
+	return msg
+}
+
+func UpLoadMessage(origin, dst, fname, data string) *Msg {
+	msg := &Msg{}
+	msg.Type = "Upload"
+	msg.LiteNode = &LiteNodeStruct{"", ""}
+	msg.Origin = ""
+	msg.Src = ""
+	msg.Dst = dst
+	msg.Data = data
+	msg.FileName = fname
+	return msg
+}
+
+func ReplicateMessage(origin, dst, fname, data string) *Msg {
+	msg := &Msg{}
+	msg.Type = "Replicate"
+	msg.LiteNode = &LiteNodeStruct{"", ""}
+	msg.Origin = origin
+	msg.Src = ""
+	msg.Dst = dst
+	msg.Data = data
+	msg.FileName = fname
 	return msg
 }

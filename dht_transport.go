@@ -61,7 +61,7 @@ func (transport *Transport) initmsgQ() {
 					//transport.Node.TaskQ <- &Task{msg, "printRingFingers"}
 				//	transport.send(&Msg{"printRing", "", v.Src, []byte("tjuuu")})
 				case "reply": //test
-					fmt.Println("hej:", string(msg.Bytes))
+					fmt.Println("hej:", string(msg.Data))
 				case "printRing":
 					go func() { transport.Node.TaskQ <- &Task{msg, "printRing"} }() //transport.Node.printRing()
 					//transport.send(&Msg{"ring", "", v.Src, []byte(transport.Node.printRing())})
@@ -106,6 +106,9 @@ func (transport *Transport) initmsgQ() {
 					go transport.Node.setNetworkFingers(msg)
 				case "LookAck":
 					go func() { transport.Node.NodeLookQ <- msg }()
+				case "Upload":
+					go transport.Node.initUpload(msg)
+
 				}
 			}
 		}

@@ -5,17 +5,17 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 	"io/ioutil"
-	"net/http"
+	//"net/http"
 	"os"
-	"strings"
+	//"strings"
 )
 
-func createFile(path, value, string) {
+func createFile(path, value string) {
 	data := []byte(value)
 	fmt.Println("data: ", value)
 	fmt.Println("path: ", path)
 	err := ioutil.WriteFile(path, data, 0777)
-	check(err)
+	errorChecker(err)
 }
 
 func fileAlreadyExits(name string) bool {
@@ -29,8 +29,8 @@ func fileAlreadyExits(name string) bool {
 }
 
 func (dhtnode *DHTNode) uploadFile(filePath, key, value string) {
-	if fileAlreadyExits(path) != true {
-		os.Mkdir(path, 0777)
+	if fileAlreadyExits(filePath) != true {
+		os.Mkdir(filePath, 0777)
 	}
 	createFile(filePath+key, value)
 }
@@ -51,18 +51,31 @@ func (dhtnode *DHTNode) createFolder() {
 }
 
 func (dhtnode *DHTNode) initUpload(msg *Msg) {
-	generatedNodeid := improvedGenerateNodeId(msg.Dst)
-	nodeIdForSuccessor := improvedGenerateNodeId(dhtnode.successor.Adress)
-	desiredPath := "storage/" + generatedNodeid + "/"
+	defaultPath := "storage/"
+	storagePath := defaultPath + dhtnode.nodeId + "/"
 
-	if fileAlreadyExits(desiredPath) != true {
-		os.Mkdir(desiredPath, 077)
+	fName, _ := b64.StdEncoding.DecodeString(msg.FileName)
+	fData, _ := b64.StdEncoding.DecodeString(msg.Data)
+
+	generatedHash := improvedGenerateNodeId(string(fName))
+
+	if dhtnode.resposibleNetworkNode(generatedHash) != true {
+		StringFileName := b64.StdEncoding.EncodeToString([]byte(fName))
+		StringFileData := b64.StdEncoding.EncodeToString([]byte(fData))
+		uploadMsg := UpLoadMessage(dhtnode.transport.BindAddress, dhtnode.predecessor.Adress, StringFileName, StringFileData)
+		go func() { dhtnode.transport.send(uploadMsg) }()
+
+	} else {
+		if !fileAlreadyExits(storagePath) {
+			os.MkdirAll(storagePath, 0777)
+		}
+		storagePath = defaultPath + dhtnode.nodeId + "/" + string(fName)
+		createFile(storagePath, string(fData))
+
+		tempStringFileName := b64.StdEncoding.EncodeToString(fName)
+		tempStringFileData := b64.StdEncoding.EncodeToString(fData)
+
+		replicateMsg := ReplicateMessage(dhtnode.transport.BindAddress, dhtnode.successor.Adress, tempStringFileName, tempStringFileData)
+		go func() { dhtnode.transport.send(replicateMsg) }()
 	}
-	FName, _ := b64.StdEncoding.DecodeString(msg.FileName)
-	FData, _ := b64.StdEncoding.DecodeString(msg.Bytes)
-	desiredPath = "storage/" + generatedNodeid + "/" + string(FName)
-	createFile(desiredPath, string(FName))
-	fNameEncodedToString :=
-	fDataEncodedToString :=
-
 }
