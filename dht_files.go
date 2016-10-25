@@ -44,7 +44,8 @@ func errorChecker(e error) {
 }
 
 func (dhtnode *DHTNode) createFolder() {
-	path := "folder/" + dhtnode.nodeId
+	path := "storage/" + dhtnode.nodeId
+	fmt.Println(dhtnode.nodeId, "does not have a folder,  creating folder", path)
 	if !fileAlreadyExits(path) {
 		os.MkdirAll(path, 0777)
 	}
@@ -78,4 +79,27 @@ func (dhtnode *DHTNode) initUpload(msg *Msg) {
 		replicateMsg := ReplicateMessage(dhtnode.transport.BindAddress, dhtnode.successor.Adress, tempStringFileName, tempStringFileData)
 		go func() { dhtnode.transport.send(replicateMsg) }()
 	}
+}
+
+func (dhtnode *DHTNode) replicator(msg *Msg) {
+	generatedId := improvedGenerateNodeId(msg.Origin)
+	defaultPath := "storage/"
+	storagePath := defaultPath + dhtnode.nodeId + "/" + generatedId + "/"
+	if !fileAlreadyExits(storagePath) {
+		os.MkdirAll(storagePath, 077)
+	}
+
+	StringFileName := b64.StdEncoding.EncodeToString([]byte(msg.FileName))
+	StringFileData := b64.StdEncoding.EncodeToString([]byte(msg.Data))
+
+	SeconddaryStoragePath := defaultPath + "/" + dhtnode.nodeId + "/" + string(StringFileName)
+
+	_, err := os.Stat(SeconddaryStoragePath)
+	if err == nil {
+		os.Remove(SeconddaryStoragePath)
+		createFile(SeconddaryStoragePath, string(StringFileData))
+	} else {
+		createFile(SeconddaryStoragePath, string(StringFileData))
+	}
+
 }

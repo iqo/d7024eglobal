@@ -64,6 +64,7 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.FingerQ = make(chan *Finger)
 	dhtNode.NodeLookQ = make(chan *Msg)
 	dhtNode.createTransport()
+	dhtNode.createFolder()
 	return dhtNode
 }
 

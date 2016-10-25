@@ -108,6 +108,8 @@ func (transport *Transport) initmsgQ() {
 					go func() { transport.Node.NodeLookQ <- msg }()
 				case "Upload":
 					go transport.Node.initUpload(msg)
+				case "Replicate":
+					go transport.Node.replicator(msg)
 
 				}
 			}
