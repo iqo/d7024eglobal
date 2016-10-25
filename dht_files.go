@@ -51,16 +51,18 @@ func (dhtnode *DHTNode) createFolder() {
 }
 
 func (dhtnode *DHTNode) initUpload(msg *Msg) {
-	nodeid := improvedGenerateNodeId(msg.Dst)
+	generatedNodeid := improvedGenerateNodeId(msg.Dst)
 	nodeIdForSuccessor := improvedGenerateNodeId(dhtnode.successor.Adress)
-	desiredPath := "storage/" + nodeid + "/"
+	desiredPath := "storage/" + generatedNodeid + "/"
 
 	if fileAlreadyExits(desiredPath) != true {
 		os.Mkdir(desiredPath, 077)
 	}
 	FName, _ := b64.StdEncoding.DecodeString(msg.FileName)
 	FData, _ := b64.StdEncoding.DecodeString(msg.Bytes)
-	desiredPath = "storage/" + nodeid + "/" + string(FName)
+	desiredPath = "storage/" + generatedNodeid + "/" + string(FName)
 	createFile(desiredPath, string(FName))
+	fNameEncodedToString :=
+	fDataEncodedToString :=
 
 }
