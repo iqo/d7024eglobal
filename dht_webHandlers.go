@@ -33,7 +33,7 @@ func (dht *DHTNode) NodeContainsHandler(w http.ResponseWriter, r *http.Request, 
 
 	for _, tempDirectory := range directorys {
 		if genAdress == tempDirectory.Name() {
-			fmt.Fprint(w, "has folder ", tempDirectory.Name(), "\n")
+			fmt.Fprint(w, dht.transport.BindAddress, " has folder ", tempDirectory.Name(), "\n")
 			tempSecondDir, _ := ioutil.ReadDir("storage/" + tempDirectory.Name() + "/")
 			for _, fileInDir := range tempSecondDir {
 				fmt.Fprint(w, "this folder contains: ", fileInDir.Name())
