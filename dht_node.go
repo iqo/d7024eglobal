@@ -25,7 +25,7 @@ type DHTNode struct {
 	HeartBeatQ  chan *Msg
 	FingerQ     chan *Finger
 	NodeLookQ   chan *Msg
-
+	//Path        string
 	alive bool
 }
 type TinyNode struct {
@@ -44,7 +44,9 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.contact.port = port
 
 	if nodeId == nil {
-		genNodeId := generateNodeId()
+		adress := ip + ":" + port
+		genNodeId := improvedGenerateNodeId(adress)
+		//genNodeId := generateNodeId()
 		dhtNode.nodeId = genNodeId
 	} else {
 		dhtNode.nodeId = *nodeId
@@ -64,6 +66,7 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.FingerQ = make(chan *Finger)
 	dhtNode.NodeLookQ = make(chan *Msg)
 	dhtNode.createTransport()
+	dhtNode.createFolder()
 	return dhtNode
 }
 
@@ -75,7 +78,7 @@ func (dhtNode *DHTNode) createTransport() {
 
 func (dhtNode *DHTNode) join(master *TinyNode) {
 	src := dhtNode.contact.ip + ":" + dhtNode.contact.port
-	message := message("join", src, master.Adress, src, dhtNode.nodeId, nil)
+	message := message("join", src, master.Adress, src, dhtNode.nodeId, "")
 	dhtNode.transport.send(message)
 	for {
 		select {
@@ -83,7 +86,7 @@ func (dhtNode *DHTNode) join(master *TinyNode) {
 			dhtNode.successor.Adress = r.Src
 			dhtNode.successor.NodeId = r.Key
 
-			dhtNode.setNetworkFingers(&Msg{"", "", "", "", nil, &LiteNodeStruct{dhtNode.successor.Adress, dhtNode.successor.NodeId}, ""})
+			dhtNode.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{dhtNode.successor.Adress, dhtNode.successor.NodeId}, "", ""})
 			fingerStart := fingerStartMessage(src, dhtNode.successor.Adress, dhtNode.transport.BindAddress, dhtNode.nodeId)
 			fmt.Println("fingerstart join: ", fingerStart)
 			go func() { dhtNode.transport.send(fingerStart) }()
@@ -99,11 +102,11 @@ func (node *DHTNode) findSucc(msg *Msg) {
 	var a = between([]byte(node.nodeId), []byte(node.successor.NodeId), []byte(msg.Key))
 	if a {
 
-		go node.transport.send(message("response", msg.Dst, msg.Origin, node.successor.Adress, node.successor.NodeId, nil))
+		go node.transport.send(message("response", msg.Dst, msg.Origin, node.successor.Adress, node.successor.NodeId, ""))
 		node.successor.Adress = msg.Origin
 		node.successor.NodeId = msg.Key
 	} else {
-		node.transport.send(message("join", msg.Origin, node.successor.Adress, msg.Dst, msg.Key, nil))
+		node.transport.send(message("join", msg.Origin, node.successor.Adress, msg.Dst, msg.Key, ""))
 
 	}
 }
