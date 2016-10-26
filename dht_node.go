@@ -125,6 +125,7 @@ func (dhtNode *DHTNode) start_server() {
 	go dhtNode.fingerTimer()
 	go dhtNode.heartTimer()
 	go dhtNode.transport.listen()
+	go dhtNode.startWebServer()
 }
 
 func (dhtNode *DHTNode) notifyNetwork(msg *Msg) {
