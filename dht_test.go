@@ -83,7 +83,8 @@ func TestDHT2(t *testing.T) {
 	fmt.Println("")
 	node2.initLookUpNetworkFinger("03", node3)
 
-	initFileUpload(node3)
+	//initFileUpload(node3)
+	initFileUpload(node2)
 	time.Sleep(time.Second * 15)
 	node5.killTheNode()
 	//node5.killTheNode()
