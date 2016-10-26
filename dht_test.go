@@ -9,7 +9,7 @@ import (
 )
 
 func TestDHT2(t *testing.T) {
-	id1 := "01"
+	/*id1 := "01"
 	id2 := "02"
 	id3 := "03"
 	id4 := "04"
@@ -25,16 +25,16 @@ func TestDHT2(t *testing.T) {
 	node4 := makeDHTNode(&id4, "localhost", "1114") //listen node do not start
 	node5 := makeDHTNode(&id5, "localhost", "1115")
 	node6 := makeDHTNode(&id6, "localhost", "1116")
-	node7 := makeDHTNode(&id7, "localhost", "1117")
+	node7 := makeDHTNode(&id7, "localhost", "1117")*/
 
-	/*node0 := makeDHTNode(nil, "localhost", "1110")
+	node0 := makeDHTNode(nil, "localhost", "1110")
 	node1 := makeDHTNode(nil, "localhost", "1111")
 	node2 := makeDHTNode(nil, "localhost", "1112")
 	node3 := makeDHTNode(nil, "localhost", "1113")
 	node4 := makeDHTNode(nil, "localhost", "1114")
 	node5 := makeDHTNode(nil, "localhost", "1115")
 	node6 := makeDHTNode(nil, "localhost", "1116")
-	node7 := makeDHTNode(nil, "localhost", "1117")*/
+	node7 := makeDHTNode(nil, "localhost", "1117")
 
 	//	key1 := "2b230fe12d1c9c60a8e489d028417ac89de57635"
 	//	key2 := "87adb987ebbd55db2c5309fd4b23203450ab0083"
@@ -53,7 +53,7 @@ func TestDHT2(t *testing.T) {
 	//	fmt.Println("TEST: " + node1.lookup(key2).nodeId + " is responsible for " + key2)
 	//	fmt.Println("TEST: " + node1.lookup(key3).nodeId + " is responsible for " + key3)
 	node1.start_server()
-	node1.setNetworkFingers(&Msg{"", "", "", "", nil, &LiteNodeStruct{node1.successor.Adress, node1.successor.NodeId}, ""})
+	node1.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{node1.successor.Adress, node1.successor.NodeId}, "", ""})
 	node2.start_server()
 	node3.start_server()
 	node7.start_server()
@@ -82,6 +82,9 @@ func TestDHT2(t *testing.T) {
 	//node1.initPrintNetworkFingers(node2)
 	fmt.Println("")
 	node2.initLookUpNetworkFinger("03", node3)
+
+	//initFileUpload(node3)
+	initFileUpload(node2)
 	time.Sleep(time.Second * 15)
 	node5.killTheNode()
 	//node5.killTheNode()

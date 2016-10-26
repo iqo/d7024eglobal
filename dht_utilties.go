@@ -104,3 +104,15 @@ func generateNodeId() string {
 
 	return fmt.Sprintf("%x", hasher.Sum(nil))
 }
+
+func improvedGenerateNodeId(adress string) string {
+	/*u, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}*/
+	// calculate sha-1 hash
+	hasher := sha1.New()
+	hasher.Write([]byte(adress))
+
+	return fmt.Sprintf("%x", hasher.Sum(nil))
+}
