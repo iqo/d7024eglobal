@@ -44,7 +44,9 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.contact.port = port
 
 	if nodeId == nil {
-		genNodeId := generateNodeId()
+		adress := ip + ":" + port
+		genNodeId := improvedGenerateNodeId(adress)
+		//genNodeId := generateNodeId()
 		dhtNode.nodeId = genNodeId
 	} else {
 		dhtNode.nodeId = *nodeId

@@ -55,6 +55,7 @@ func (dhtnode *DHTNode) createFolder() {
 
 func (dhtnode *DHTNode) upload(msg *Msg) {
 	defaultPath := "storage/"
+
 	storagePath := defaultPath + dhtnode.nodeId + "/"
 
 	fName, _ := b64.StdEncoding.DecodeString(msg.FileName)
@@ -77,7 +78,6 @@ func (dhtnode *DHTNode) upload(msg *Msg) {
 
 		tempStringFileName := b64.StdEncoding.EncodeToString(fName)
 		tempStringFileData := b64.StdEncoding.EncodeToString(fData)
-
 		replicateMsg := ReplicateMessage(dhtnode.transport.BindAddress, dhtnode.successor.Adress, tempStringFileName, tempStringFileData)
 		go func() { dhtnode.transport.send(replicateMsg) }()
 	}
@@ -97,7 +97,7 @@ func (dhtnode *DHTNode) replicator(msg *Msg) {
 	//StringFileName := b64.StdEncoding.EncodeToString([]byte(msg.FileName))
 	//StringFileData := b64.StdEncoding.EncodeToString([]byte(msg.Data))
 
-	SeconddaryStoragePath := defaultPath + "/" + dhtnode.nodeId + "/" + generatedId + string(StringFileName)
+	SeconddaryStoragePath := defaultPath + dhtnode.nodeId + "/" + generatedId + string(StringFileName)
 
 	_, err := os.Stat(SeconddaryStoragePath)
 	if err == nil {
@@ -110,10 +110,10 @@ func (dhtnode *DHTNode) replicator(msg *Msg) {
 }
 
 func (dhtnode *DHTNode) responsible(filename, data string) {
-	respTimer := time.NewTimer(time.Second * 2)
 	FName, _ := b64.StdEncoding.DecodeString(filename)
 	generatedHash := improvedGenerateNodeId(string(FName))
 	dhtnode.initNetworkLookUp(generatedHash)
+	respTimer := time.NewTimer(time.Second * 2)
 	for {
 		select {
 		case fingerResp := <-dhtnode.FingerQ:
@@ -144,4 +144,8 @@ func initFileUpload(dhtnode *DHTNode) {
 
 		dhtnode.responsible(stringFile, stringData)
 	}
+}
+
+func (dhtnode *DHTNode) passFileForward() {
+
 }
