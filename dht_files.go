@@ -47,8 +47,8 @@ func errorChecker(e error) {
 func (dhtnode *DHTNode) createFolder() {
 	deafultFolder := "storage/"
 	path := deafultFolder + dhtnode.nodeId
-	fmt.Println(dhtnode.nodeId, "creating folder", path)
 	if !fileAlreadyExits(path) {
+		fmt.Println(dhtnode.nodeId, " does not have folder, creating folder in ", path)
 		os.MkdirAll(path, 0777)
 	}
 }
