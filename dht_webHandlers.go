@@ -61,3 +61,28 @@ func (dht *DHTNode) NodeContainsHandler(w http.ResponseWriter, r *http.Request, 
 	}
 	return &Page{Title: title, Body: body}, nil
 }*/
+
+func (dht *DHTNode) NodeContainsFileHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	//	directorys, err := ioutil.ReadDir("storage/")
+	//adress := dht.contact.ip + ":" + dht.contact.port
+	//genAdress := improvedGenerateNodeId(adress)
+	directorys, err := ioutil.ReadDir("storage/")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, tempDirectory := range directorys {
+
+		folderNodeAdress, err := ioutil.ReadDir("storage/" + tempDirectory.Name())
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, sencondTemp := range folderNodeAdress {
+			if !sencondTemp.IsDir() {
+				fmt.Fprint(w, "system contains these files\n")
+				fmt.Fprint(w, sencondTemp.Name(), "\n")
+			}
+		}
+	}
+}

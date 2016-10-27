@@ -18,7 +18,7 @@ func (dhtnode *DHTNode) startWebServer() {
 	router := httprouter.New()
 	ipAdressOfNode := dhtnode.transport.BindAddress
 
-	//router.GET("/", dhtnode.Index)
+	router.GET("/", dhtnode.NodeContainsFileHandler)
 	router.GET("/contains", dhtnode.NodeContainsHandler)
 	log.Fatal(http.ListenAndServe(ipAdressOfNode, router))
 	//http.ListenAndServe(ipAdressOfNode, router)

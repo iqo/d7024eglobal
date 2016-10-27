@@ -25,6 +25,7 @@ type DHTNode struct {
 	HeartBeatQ  chan *Msg
 	FingerQ     chan *Finger
 	NodeLookQ   chan *Msg
+	FileQ       chan *File
 	//Path        string
 	alive bool
 }
@@ -65,6 +66,7 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.HeartBeatQ = make(chan *Msg)
 	dhtNode.FingerQ = make(chan *Finger)
 	dhtNode.NodeLookQ = make(chan *Msg)
+	dhtNode.FileQ = make(chan *File)
 	dhtNode.createTransport()
 	dhtNode.createFolder()
 	return dhtNode
@@ -287,7 +289,14 @@ func (dhtnode *DHTNode) bringNodeBack(master *TinyNode) {
 	src2 := dhtnode.contact.ip + ":" + dhtnode.contact.port
 	if dhtnode.alive == false {
 		dhtnode.alive = true
-		dhtnode.start_server()
+
+		go dhtnode.initTaskQ()
+		go dhtnode.stableTimmer()
+		go dhtnode.fingerTimer()
+		go dhtnode.heartTimer()
+		go dhtnode.transport.listen()
+		//go dhtNode.startWebServer()
+		//dhtnode.start_server()
 		dhtnode.successor.NodeId = dhtnode.nodeId
 		dhtnode.successor.Adress = src2
 		master.NodeId = dhtnode.nodeId
