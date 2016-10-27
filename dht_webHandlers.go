@@ -23,22 +23,23 @@ func (dht *DHTNode) Index(w http.ResponseWriter, r *http.Request, _ httprouter.P
 }
 
 func (dht *DHTNode) NodeContainsHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	directorys, err := ioutil.ReadDir("storage/")
+	//	directorys, err := ioutil.ReadDir("storage/")
 	adress := dht.contact.ip + ":" + dht.contact.port
 	genAdress := improvedGenerateNodeId(adress)
+	directorys, err := ioutil.ReadDir("storage/" + genAdress + "/")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, tempDirectory := range directorys {
-		if genAdress == tempDirectory.Name() {
-			fmt.Fprint(w, dht.transport.BindAddress, " has folder ", tempDirectory.Name(), "\n")
-			tempSecondDir, _ := ioutil.ReadDir("storage/" + tempDirectory.Name() + "/")
-			for _, fileInDir := range tempSecondDir {
-				fmt.Fprint(w, "this folder contains: ", fileInDir.Name())
-			}
+		if tempDirectory.IsDir() {
+			fmt.Fprint(w, dht.transport.BindAddress, " contains backup for ", tempDirectory.Name())
+		} else {
+			fmt.Fprint(w, dht.transport.BindAddress, " contains the file ", tempDirectory.Name())
 		}
+		//fmt.Fprint(w, dht.transport.BindAddress," contains "tempDirectory.Name())
+
 	}
 }
 
