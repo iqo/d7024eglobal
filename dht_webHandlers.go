@@ -43,6 +43,13 @@ func (dht *DHTNode) NodeContainsHandler(w http.ResponseWriter, r *http.Request, 
 	}
 }
 
+func (dhtNode *DHTNode) UpdateKey(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	fmt.Println("_______________________________________________________________________")
+	fmt.Println(p.ByName("key"))
+	fmt.Println("_______________________________________________________________________")
+	fmt.Fprint(w, p.ByName("key"))
+}
+
 /*func (dht *DHTNode) viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/view/"):]
 	p, err := loadPage(title)

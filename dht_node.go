@@ -25,7 +25,6 @@ type DHTNode struct {
 	HeartBeatQ  chan *Msg
 	FingerQ     chan *Finger
 	NodeLookQ   chan *Msg
-	FileQ       chan *File
 	//Path        string
 	alive bool
 }
@@ -45,8 +44,7 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.contact.port = port
 
 	if nodeId == nil {
-		adress := ip + ":" + port
-		genNodeId := improvedGenerateNodeId(adress)
+		genNodeId := improvedGenerateNodeId(ip + ":" + port)
 		//genNodeId := generateNodeId()
 		dhtNode.nodeId = genNodeId
 	} else {
@@ -66,7 +64,6 @@ func makeDHTNode(nodeId *string, ip string, port string) *DHTNode {
 	dhtNode.HeartBeatQ = make(chan *Msg)
 	dhtNode.FingerQ = make(chan *Finger)
 	dhtNode.NodeLookQ = make(chan *Msg)
-	dhtNode.FileQ = make(chan *File)
 	dhtNode.createTransport()
 	dhtNode.createFolder()
 	return dhtNode
@@ -78,24 +75,28 @@ func (dhtNode *DHTNode) createTransport() {
 	dhtNode.transport.initmsgQ()
 }
 
-func (dhtNode *DHTNode) join(master *TinyNode) {
-	src := dhtNode.contact.ip + ":" + dhtNode.contact.port
-	message := message("join", src, master.Adress, src, dhtNode.nodeId, "")
-	dhtNode.transport.send(message)
+func (node *DHTNode) join(master *TinyNode) {
+	src := node.contact.ip + ":" + node.contact.port
+	message := message("join", src, master.Adress, src, node.nodeId, "")
+	node.transport.send(message)
 	for {
 		select {
-		case r := <-dhtNode.ResponseQ:
-			dhtNode.successor.Adress = r.Src
-			dhtNode.successor.NodeId = r.Key
+		case r := <-node.ResponseQ:
 
-			dhtNode.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{dhtNode.successor.Adress, dhtNode.successor.NodeId}, "", ""})
-			fingerStart := fingerStartMessage(src, dhtNode.successor.Adress, dhtNode.transport.BindAddress, dhtNode.nodeId)
+			dataFromSuccessor := dataFromSuccessorMessage(node.transport.BindAddress, node.successor.Adress, node.transport.BindAddress, node.nodeId)
+			go func() { node.transport.send(dataFromSuccessor) }()
+			node.successor.Adress = r.Src
+			node.successor.NodeId = r.Key
+
+			node.setNetworkFingers(&Msg{"", "", "", "", "", &LiteNodeStruct{node.successor.Adress, node.successor.NodeId}, "", ""})
+			fingerStart := fingerStartMessage(src, node.successor.Adress, node.transport.BindAddress, node.nodeId)
 			fmt.Println("fingerstart join: ", fingerStart)
-			go func() { dhtNode.transport.send(fingerStart) }()
+			go func() { node.transport.send(fingerStart) }()
 			return
 			//fmt.Println(dhtNode.nodeId, dhtNode.successor)
 		}
 	}
+	//if finger har information,
 }
 
 //Ligger du mellan noderna, nej. skicka join msg till nästa nod och kolla
@@ -126,14 +127,19 @@ func (dhtNode *DHTNode) start_server() {
 	go dhtNode.stableTimmer()
 	go dhtNode.fingerTimer()
 	go dhtNode.heartTimer()
-	go dhtNode.transport.listen()
 	go dhtNode.startWebServer()
+	go dhtNode.transport.listen()
 }
 
-func (dhtNode *DHTNode) notifyNetwork(msg *Msg) {
-	if (dhtNode.predecessor.Adress == "") || between([]byte(dhtNode.predecessor.NodeId), []byte(dhtNode.nodeId), []byte(msg.LiteNode.Id)) {
-		dhtNode.predecessor.Adress = msg.LiteNode.Adress
-		dhtNode.predecessor.NodeId = msg.LiteNode.Id
+func (node *DHTNode) notifyNetwork(msg *Msg) {
+	if (node.predecessor.Adress == "") || between([]byte(node.predecessor.NodeId), []byte(node.nodeId), []byte(msg.LiteNode.Id)) {
+		node.predecessor.Adress = msg.LiteNode.Adress
+		node.predecessor.NodeId = msg.LiteNode.Id
+		go node.replicateNecessary()
+		delete := deleteBackupMessage(node.transport.BindAddress, node.successor.Adress, node.predecessor.NodeId)
+		go node.transport.send(delete)
+		/* replicateneccesary funktion och sedan deletebackupMsg.
+		Transport send på msg.*/
 	}
 }
 
@@ -218,8 +224,10 @@ func (node *DHTNode) createNewTask(msg *Msg, typeOfTask string) {
 }
 
 func (node *DHTNode) setSucc(msg *Msg) {
+
 	node.successor.Adress = msg.Src
 	node.successor.NodeId = msg.Key
+
 }
 
 func (node *DHTNode) setPred(msg *Msg) {
@@ -258,7 +266,6 @@ func (dhtnode *DHTNode) killTheNode() {
 func (dhtnode *DHTNode) updateSucc(key string) {
 	tempFinger := &Finger{dhtnode.successor.NodeId, dhtnode.successor.Adress}
 	dhtAdress := dhtnode.contact.ip + ":" + dhtnode.contact.port
-	//getPredOfFinger := getNodeMessage(dhtAdress, dhtnode.fingers.Nodefingerlist[key].adress)
 	lenOfFingerList := len(dhtnode.fingers.Nodefingerlist)
 	for i := 0; i < lenOfFingerList; i++ {
 		if dhtnode.fingers.Nodefingerlist[i].Id > key {
@@ -289,19 +296,18 @@ func (dhtnode *DHTNode) bringNodeBack(master *TinyNode) {
 	src2 := dhtnode.contact.ip + ":" + dhtnode.contact.port
 	if dhtnode.alive == false {
 		dhtnode.alive = true
-
+		//dhtnode.start_server()
 		go dhtnode.initTaskQ()
 		go dhtnode.stableTimmer()
 		go dhtnode.fingerTimer()
 		go dhtnode.heartTimer()
 		go dhtnode.transport.listen()
-		//go dhtNode.startWebServer()
-		//dhtnode.start_server()
 		dhtnode.successor.NodeId = dhtnode.nodeId
 		dhtnode.successor.Adress = src2
 		master.NodeId = dhtnode.nodeId
 		master.Adress = src2
 		dhtnode.join(master)
+
 		fmt.Println("node ", dhtnode.nodeId, "rejoining the ring ")
 	}
 }

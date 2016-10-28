@@ -253,3 +253,32 @@ func ReplicateMessage(origin, dst, fname, data string) *Msg {
 	msg.FileName = fname
 	return msg
 }
+
+func deleteFileMessage(origin, dst, filename string) *Msg {
+	msg := &Msg{}
+	msg.Type = "DeleteSuccessorFile"
+	msg.Origin = origin
+	msg.Dst = dst
+	msg.FileName = filename
+	return msg
+}
+
+func deleteBackupMessage(origin, dst, filename string) *Msg {
+	msg := &Msg{}
+	msg.Type = "deleteBackup"
+	msg.Origin = origin
+	msg.Dst = dst
+	msg.FileName = filename
+	return msg
+}
+
+func dataFromSuccessorMessage(origin, dst, adress, id string) *Msg {
+	msg := &Msg{}
+	msg.Type = "dataFromSuccessor"
+	msg.Origin = origin
+	msg.Dst = dst
+	msg.LiteNode = &LiteNodeStruct{adress, id}
+	//msg.Adress = msg.LiteNode.Adress
+	//msg.Id = msg.LiteNode.Id
+	return msg
+}

@@ -25,7 +25,7 @@ func (dhtnode *DHTNode) initNetworkLookUp(key string) {
 	nodeadress := dhtnode.contact.ip + ":" + dhtnode.contact.port
 	if dhtnode.resposibleNetworkNode(key) {
 		dhtnode.FingerQ <- &Finger{dhtnode.nodeId, nodeadress}
-		fmt.Println("key")
+		//fmt.Println("key")
 	} else {
 		lookUpMsg := lookUpMessage(nodeadress, key, nodeadress, dhtnode.successor.Adress)
 		go dhtnode.transport.send(lookUpMsg)

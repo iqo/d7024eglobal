@@ -20,6 +20,7 @@ func (dhtnode *DHTNode) startWebServer() {
 
 	router.GET("/", dhtnode.NodeContainsFileHandler)
 	router.GET("/contains", dhtnode.NodeContainsHandler)
+	router.POST("/storage/:key", dhtnode.UpdateKey)
 	log.Fatal(http.ListenAndServe(ipAdressOfNode, router))
 	//http.ListenAndServe(ipAdressOfNode, router)
 }

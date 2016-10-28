@@ -3,12 +3,15 @@ package dht
 //go test -test.run TestDHT1
 
 import (
+	//b64 "encoding/base64"
 	"fmt"
+	//"io/ioutil"
 	"testing"
 	"time"
 )
 
 func TestDHT2(t *testing.T) {
+
 	/*id1 := "01"
 	id2 := "02"
 	id3 := "03"
@@ -17,7 +20,6 @@ func TestDHT2(t *testing.T) {
 	id6 := "06"
 	id7 := "07"
 	id0 := "00"
-
 	node0 := makeDHTNode(&id0, "localhost", "1110")
 	node1 := makeDHTNode(&id1, "localhost", "1111")
 	node2 := makeDHTNode(&id2, "localhost", "1112")
@@ -74,31 +76,53 @@ func TestDHT2(t *testing.T) {
 	node0.join(Master)
 	node6.join(Master)
 	node5.join(Master)
+
+	time.Sleep(time.Second * 15)
+	fmt.Println("")
+	fmt.Println("")
+	node2.initLookUpNetworkFinger("03", node3)
+	/*filePath := "readme/"
+	filesInPath, err := ioutil.ReadDir(filePath)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, temp := range filesInPath {
+		readFile, _ := ioutil.ReadFile(filePath + temp.Name())
+
+		stringFile := b64.StdEncoding.EncodeToString([]byte(temp.Name()))
+		stringData := b64.StdEncoding.EncodeToString(readFile)
+		node3.responsible(stringFile, stringData)
+	}*/
+
 	//node1.isTheNodeAlive()
 	//node1.killTheNode()
+
+	initFileUpload(node2)
 	time.Sleep(time.Second * 15)
 	fmt.Println("")
 	//node5.PrintOutNetworkFingers()
 	//node1.initPrintNetworkFingers(node2)
 	fmt.Println("")
-	node2.initLookUpNetworkFinger("03", node3)
+	//node2.initLookUpNetworkFinger("03", node3)
 
-	//initFileUpload(node3)
-	initFileUpload(node2)
+	//node1.initPrintNetworkFingers(node2)
 	time.Sleep(time.Second * 15)
-	node5.killTheNode()
-	//node5.killTheNode()
+	//node3.killTheNode()
+	node7.killTheNode()
 	time.Sleep(time.Second * 15)
 	fmt.Println("")
-	node1.initPrintNetworkFingers(node2)
+	//node1.initPrintNetworkFingers(node2)
 	//node5.PrintOutNetworkFingers()
 	fmt.Println("")
 	time.Sleep(time.Second * 15)
-	node5.bringNodeBack(Master)
+	node7.bringNodeBack(Master)
 	time.Sleep(time.Second * 15)
 	node1.initPrintNetworkFingers(node2)
 	time.Sleep(time.Second * 15)
 	node1.initPrintNetworkFingers(node2)
+
+	//node1.initPrintNetworkFingers(node2)
 
 	//node1.PrintOutNetworkFingers()
 	//node1.isTheNodeAlive()

@@ -19,6 +19,7 @@ func (dhtnode *DHTNode) heartBeat() {
 
 		case <-waitTimer.C:
 			fmt.Println("heartstop", dhtnode.contact.port)
+			dhtnode.disconnectedNodeResponsibility()
 			dhtnode.predecessor.Adress = ""
 			dhtnode.predecessor.NodeId = ""
 			dhtnode.createNewTask(nil, "stabilize")

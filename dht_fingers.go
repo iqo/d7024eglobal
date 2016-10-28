@@ -8,7 +8,7 @@ import (
 
 const bits int = 3
 
-/*type FingerTable struct{
+/*type FingerTable struct{cls
 	Nodefingerlist [bits]*DHTNode
 }
 */
@@ -70,7 +70,7 @@ func (node *DHTNode) updateNetworkFingers() {
 
 				case <-responseTimmer.C:
 
-					fmt.Println("timeout in updateNetworkFingers: ")
+		//			fmt.Println("timeout in updateNetworkFingers: ")
 					booleanResponseTest = true
 				}
 			}

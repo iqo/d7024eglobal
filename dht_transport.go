@@ -106,10 +106,19 @@ func (transport *Transport) initmsgQ() {
 					go transport.Node.setNetworkFingers(msg)
 				case "LookAck":
 					go func() { transport.Node.NodeLookQ <- msg }()
+
+				/* REPLICATE STUFF DOWN HERE*/
+
 				case "Upload":
 					go transport.Node.upload(msg)
+				case "dataFromSuccessor":
+					go transport.Node.dataFromSuccessor(msg)
 				case "Replicate":
 					go transport.Node.replicator(msg)
+				case "deleteBackup":
+					go transport.Node.deleteSuccessorBackup(msg)
+				case "DeleteSuccessorFile":
+					go transport.Node.deleteSuccessorFile(msg)
 
 				}
 			}
